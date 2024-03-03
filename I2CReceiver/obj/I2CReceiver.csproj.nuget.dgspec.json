@@ -1,26 +1,33 @@
 {
   "format": 1,
   "restore": {
-    "/home/colin/Documents/Projekt/SeilRoboter/I2CReceiver/I2CReceiver.csproj": {}
+    "W:\\Seilroboter\\I2CReceiver\\I2CReceiver.csproj": {}
   },
   "projects": {
-    "/home/colin/Documents/Projekt/SeilRoboter/I2CReceiver/I2CReceiver.csproj": {
+    "W:\\Seilroboter\\I2CReceiver\\I2CReceiver.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/colin/Documents/Projekt/SeilRoboter/I2CReceiver/I2CReceiver.csproj",
+        "projectUniqueName": "W:\\Seilroboter\\I2CReceiver\\I2CReceiver.csproj",
         "projectName": "I2CReceiver",
-        "projectPath": "/home/colin/Documents/Projekt/SeilRoboter/I2CReceiver/I2CReceiver.csproj",
-        "packagesPath": "/home/colin/.nuget/packages/",
-        "outputPath": "/home/colin/Documents/Projekt/SeilRoboter/I2CReceiver/obj/",
+        "projectPath": "W:\\Seilroboter\\I2CReceiver\\I2CReceiver.csproj",
+        "packagesPath": "C:\\Users\\Colin\\.nuget\\packages\\",
+        "outputPath": "W:\\Seilroboter\\I2CReceiver\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/colin/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Colin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "https://api.nuget.org/v3/index.json": {}
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://swms-gmbh.pkgs.visualstudio.com/_packaging/NuGet_SWMS/nuget/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
@@ -32,11 +39,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -45,7 +47,7 @@
           "dependencies": {
             "System.Device.Gpio": {
               "target": "Package",
-              "version": "[1.3.1, )"
+              "version": "[3.1.0, )"
             },
             "Unosquare.Raspberry.IO": {
               "target": "Package",
@@ -72,7 +74,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/home/colin/.dotnet/sdk/8.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
