@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("I2CReceiver")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("0.0.0.1")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ae07ef3a218f67e628c863676178a33910e74d4a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ea7ff51f35e7d1d7c7321c694e2f08fb94213bdd")]
 [assembly: System.Reflection.AssemblyProductAttribute("I2CReceiver")]
 [assembly: System.Reflection.AssemblyTitleAttribute("I2CReceiver")]
 [assembly: System.Reflection.AssemblyVersionAttribute("0.0.0.1")]
