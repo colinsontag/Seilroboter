@@ -21,7 +21,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulation", "Simulation", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Machine", "Machine", "{2B3EAB26-AC5C-4F93-8B8B-6FB8112647B2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{87C0D0B5-4D64-41B0-995A-B39B4C430505}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "I2C_Receive", "I2C_Receive\I2C_Receive.csproj", "{839A0D3B-9556-4333-BACF-52F3F08107BE}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{839A0D3B-9556-4333-BACF-52F3F08107BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{839A0D3B-9556-4333-BACF-52F3F08107BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{839A0D3B-9556-4333-BACF-52F3F08107BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{839A0D3B-9556-4333-BACF-52F3F08107BE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
@@ -30,6 +44,8 @@ Global
 		{689405CD-947F-40E1-8C2B-C79596AB43C6} = {7D9879EB-DB7C-429B-BC56-17A9DED18C54}
 		{A6F37DF9-1CCE-45BC-AA31-9CD8F36EC458} = {A576CFCB-5AFF-4F34-8B10-93FC09D0A852}
 		{2B3EAB26-AC5C-4F93-8B8B-6FB8112647B2} = {A576CFCB-5AFF-4F34-8B10-93FC09D0A852}
+		{87C0D0B5-4D64-41B0-995A-B39B4C430505} = {7D9879EB-DB7C-429B-BC56-17A9DED18C54}
+		{839A0D3B-9556-4333-BACF-52F3F08107BE} = {87C0D0B5-4D64-41B0-995A-B39B4C430505}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {78365FE0-0584-4640-AACA-24E35DBC161A}
