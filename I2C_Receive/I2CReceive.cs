@@ -2,42 +2,48 @@
 using System.Threading;
 using System.Device.I2c;
 
-class I2CReceive
+class Program
 {
     static void Main(string[] args)
     {
-        // I2C-Adresse des Arduino
-        const int ArduinoI2CAddress = 9;
-
         // I2C-Busnummer auf dem Raspberry Pi
         const int I2CBusId = 1;
 
-        // Erstellen Sie eine I2cConnectionSettings-Instanz für die Verbindung zum Arduino
-        var connectionSettings = new I2cConnectionSettings(I2CBusId, ArduinoI2CAddress);
-
-        // Erstellen Sie eine I2cDevice-Instanz für die Kommunikation über I2C
-        using (I2cDevice i2cDevice = I2cDevice.Create(connectionSettings))
-        {
-            Console.WriteLine("Warte auf Daten...");
-
-            while (true)
+        // Arduino I2C Addresses
+        int[] arduinoAddresses = { 9, 10, 11 };
+        while (true)
+        {            
+        
+            // Schleife durch die verschiedenen Arduinos
+            foreach (int address in arduinoAddresses)
             {
-                byte[] receiveBuffer = new byte[4];
+                // Erstellen Sie eine I2cConnectionSettings-Instanz für die Verbindung zum Arduino
+                var connectionSettings = new I2cConnectionSettings(I2CBusId, address);
 
-                // Lesen Sie Daten vom Arduino
-                i2cDevice.Read(receiveBuffer);
+                // Erstellen Sie eine I2cDevice-Instanz für die Kommunikation über I2C
+                using (I2cDevice i2cDevice = I2cDevice.Create(connectionSettings))
+                {
+                    Console.WriteLine($"Warte auf Daten von Arduino {address}...");
 
-                // Umkehren der Reihenfolge der Bytes
-                Array.Reverse(receiveBuffer);
+                    
+                    byte[] receiveBuffer = new byte[4];
 
-                // Konvertieren Sie die empfangenen Daten in eine 32-Bit-Ganzzahl
-                int counterValue = BitConverter.ToInt32(receiveBuffer, 0);
+                    // Lesen Sie Daten vom aktuellen Arduino
+                    i2cDevice.Read(receiveBuffer);
 
-                // Anzeigen der empfangenen Daten
-                Console.WriteLine("Empfangene Daten: " + counterValue);
+                    // Umkehren der Reihenfolge der Bytes
+                    Array.Reverse(receiveBuffer);
 
-                // Verzögerung zwischen den Lesevorgängen
-                Thread.Sleep(1000);
+                    // Konvertieren Sie die empfangenen Daten in eine 32-Bit-Ganzzahl
+                    int counterValue = BitConverter.ToInt32(receiveBuffer, 0);
+
+                    // Anzeigen der empfangenen Daten
+                    Console.WriteLine($"Empfangene Daten von Arduino {address}: {counterValue}");
+
+                    // Verzögerung zwischen den Lesevorgängen
+                    Thread.Sleep(500);
+                    
+                }
             }
         }
     }
