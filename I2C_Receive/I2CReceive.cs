@@ -4,47 +4,36 @@ using System.Device.I2c;
 
 class Program
 {
+    private static bool askForCounterValues = true;
     static void Main(string[] args)
     {
-        // I2C-Busnummer auf dem Raspberry Pi
+        //I2C-Busnumber
         const int I2CBusId = 1;
 
-        // Arduino I2C Addresses
+        //Arduino I2C Addresses
         int[] arduinoAddresses = { 9, 10, 11 };
-        while (true)
-        {            
-        
-            // Schleife durch die verschiedenen Arduinos
+        while (askForCounterValues)
+        {      
             foreach (int address in arduinoAddresses)
-            {
-                // Erstellen Sie eine I2cConnectionSettings-Instanz für die Verbindung zum Arduino
-                var connectionSettings = new I2cConnectionSettings(I2CBusId, address);
-
-                // Erstellen Sie eine I2cDevice-Instanz für die Kommunikation über I2C
-                using (I2cDevice i2cDevice = I2cDevice.Create(connectionSettings))
-                {
-                    Console.WriteLine($"Warte auf Daten von Arduino {address}...");
-
-                    
-                    byte[] receiveBuffer = new byte[4];
-
-                    // Lesen Sie Daten vom aktuellen Arduino
-                    i2cDevice.Read(receiveBuffer);
-
-                    // Umkehren der Reihenfolge der Bytes
-                    Array.Reverse(receiveBuffer);
-
-                    // Konvertieren Sie die empfangenen Daten in eine 32-Bit-Ganzzahl
-                    int counterValue = BitConverter.ToInt32(receiveBuffer, 0);
-
-                    // Anzeigen der empfangenen Daten
-                    Console.WriteLine($"Empfangene Daten von Arduino {address}: {counterValue}");
-
-                    // Verzögerung zwischen den Lesevorgängen
-                    Thread.Sleep(500);
-                    
-                }
+            {                             
+                var counterValue = GetCounterValue(I2CBusId, address);
+                Console.WriteLine($"Daten von Arduino {address}: {counterValue}");                
+                Thread.Sleep(500);
             }
         }
+    }
+
+    private static int GetCounterValue(int I2CBusId, int address)
+    {
+        var connectionSettings = new I2cConnectionSettings(I2CBusId, address);
+
+
+        I2cDevice i2cDevice = I2cDevice.Create(connectionSettings);
+        byte[] receiveBuffer = new byte[4];
+
+        i2cDevice.Read(receiveBuffer);
+        Array.Reverse(receiveBuffer);
+
+        return BitConverter.ToInt32(receiveBuffer, 0);
     }
 }
