@@ -5,6 +5,8 @@ namespace ConfigManger
 {
     public class ConfigSettings
     {
-        public required Dictionary<string, Point3D> Drives { get; set; }
+        public Point3D Drive1Position { get; set; }
+        public Point3D Drive2Position { get; set; }
+        public Point3D Drive3Position { get; set; }
     }
 }
