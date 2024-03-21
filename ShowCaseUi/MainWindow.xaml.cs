@@ -46,13 +46,13 @@ namespace ShowCaseUi
             // Generate points in a circle with varying Z value
             for (double i = 0; i < 2 * Math.PI; i += Math.PI / 100) // 200 points in a circle
             {
-                redPoints.Add(new Vector3((float)Math.Cos(i) * 25, (float)Math.Sin(i) * 25, 50 + (float)Math.Sin(i) * 25)); // 25 is the radius of the circle, Z value changes with sin(i)
+                redPoints.Add(new Vector3((float)Math.Cos(i) * 25 + 50, (float)Math.Sin(i) * 25 + 50, 50 + (float)Math.Sin(i) * 25)); // 25 is the radius of the circle, Z value changes with sin(i)
             }
 
             currentRedPointIndex = 0;
-            
-                ShowRedPoint();
-            
+
+            ShowRedPoint();
+
 
 
             // Set up a timer to move to the next red point every 0.5 second
