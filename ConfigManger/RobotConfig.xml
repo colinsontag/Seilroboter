@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<RobotConfig>
+  <Drive1Position>
+    <X>100</X>
+    <Y>100</Y>
+    <Z>100</Z>
+  </Drive1Position>
+  <Drive2Position>
+    <X>0</X>
+    <Y>0</Y>
+    <Z>100</Z>
+  </Drive2Position>
+  <Drive3Position>
+    <X>100</X>
+    <Y>0</Y>
+    <Z>100</Z>
+  </Drive3Position>
+</RobotConfig>
+
