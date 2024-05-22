@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ConfigManger\ConfigManger.csproj" />
+    <ProjectReference Include="..\Machine\Machine.csproj" />
   </ItemGroup>
 
 </Project>

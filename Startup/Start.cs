@@ -1,5 +1,6 @@
 ﻿using ConfigManger;
-using Microsoft.VisualBasic;
+using Machine;
+using MathNet.Spatial.Euclidean;
 
 namespace Workflow
 {
@@ -9,7 +10,19 @@ namespace Workflow
         {
             RobotConfig InitialRobotConfig = ConfigTools.LoadFromXML(@"W:\Seilroboter\ConfigManger\RobotConfig.xml");
 
-            
+            var drives = new List<Drive>
+            {
+                new Drive("Drive1", InitialRobotConfig.Drive1MountPosition, 0),
+                new Drive("Drive2", InitialRobotConfig.Drive2MountPosition, 0),
+                new Drive("Drive3", InitialRobotConfig.Drive3MountPosition, 0)
+            };
+
+            MachinePoint tCP = new MachinePoint
+            {
+                Name = "TCP",
+                Position = new Point3D(0, 0, 0)
+            };
+
 
         }
     }
