@@ -9,6 +9,8 @@ namespace Workflow
         {
             RobotConfig InitialRobotConfig = ConfigTools.LoadFromXML(@"W:\Seilroboter\ConfigManger\RobotConfig.xml");
 
+            
+
         }
     }
 }
