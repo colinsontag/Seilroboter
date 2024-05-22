@@ -7,13 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MathNet.Spatial" Version="0.6.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="RobotConfig.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\ConfigManger\ConfigManger.csproj" />
   </ItemGroup>
 
 </Project>
