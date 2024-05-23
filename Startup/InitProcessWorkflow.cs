@@ -13,8 +13,8 @@ namespace Startup
     {
         internal static void Start(out List<Drive> drives,out MachinePoint tCP)
         {
-            RobotConfig InitialRobotConfig = ConfigTools.LoadFromXML(@"W:\Seilroboter\ConfigManger\RobotConfig.xml");
-
+            RobotConfig InitialRobotConfig = ConfigTools.LoadFromXML(@"/home/colin/Documents/Seilroboter/Seilroboter/ConfigManger/RobotConfig.xml");
+            //RobotConfig InitialRobotConfig = ConfigTools.LoadFromXML(@"/home/colin/Documents/Seilroboter/Seilroboter/ConfigManger/RobotConfig.xml");
             drives = new List<Drive>
             {
                 new Drive("Drive1", InitialRobotConfig.Drive1MountPosition, 0),
