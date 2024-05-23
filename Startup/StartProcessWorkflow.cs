@@ -28,26 +28,29 @@ namespace Startup
             Console.WriteLine(drives[0].UnrolledCableLength);
 
             double cableLenghtToReach = 150;
-
-            while (Math.Abs(drives[0].UnrolledCableLength - cableLenghtToReach) > 1)
+            while (cableLenghtToReach != 666)
             {
-                motorOn = true;
-                if (drives[0].UnrolledCableLength < cableLenghtToReach)
+                while (Math.Abs(drives[0].UnrolledCableLength - cableLenghtToReach) > 1)
                 {
-                    motorPlus = true;
-                }
-                else
-                {
-                    motorPlus = false;
+                    motorOn = true;
+                    if (drives[0].UnrolledCableLength < cableLenghtToReach)
+                    {
+                        motorPlus = true;
+                    }
+                    else
+                    {
+                        motorPlus = false;
+                    }
+                    SendMotor(i2cDevice, motorOn, motorPlus);
+                    drives[0].UnrolledCableLength = RefreshDrive(i2cDevice, drive1Adress, I2CBusId);
+                    Console.WriteLine(drives[0].UnrolledCableLength);
+                    Thread.Sleep(500);
+                    motorOn = false;
                 }
                 SendMotor(i2cDevice, motorOn, motorPlus);
-                drives[0].UnrolledCableLength = RefreshDrive(i2cDevice, drive1Adress, I2CBusId);
-                Console.WriteLine(drives[0].UnrolledCableLength);
-                Thread.Sleep(500);
-                motorOn = false;
+                Console.WriteLine("Neue Laenge Eingeben");
+                cableLenghtToReach = Convert.ToDouble(Console.ReadLine());
             }
-            SendMotor(i2cDevice, motorOn, motorPlus);
-
         }
         private static double RefreshDrive(I2cDevice i2cDevice, int arduinoAddress, int I2CBusId)
         {
