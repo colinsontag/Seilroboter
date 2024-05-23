@@ -21,19 +21,28 @@ namespace Startup
             const int drive2Adress = 10;
             const int drive3Adress = 11;
             bool motorOn = false;
+            bool motorPlus = false;
             drives[0].UnrolledCableLength = RefreshDrive(drive1Adress, I2CBusId);
             Console.WriteLine(drives[0].UnrolledCableLength);
             double cableLenghtToReach = 150;
-            while (drives[0].UnrolledCableLength >= cableLenghtToReach)
+            while (Math.Abs(drives[0].UnrolledCableLength - cableLenghtToReach) < 1)
             {
                 motorOn = true;
-                SendMotor(drive1Adress, I2CBusId, motorOn);
+                if (drives[0].UnrolledCableLength < cableLenghtToReach)
+                {
+                    motorPlus = true;
+                }
+                else
+                {
+                    motorPlus = false;
+                }
+                SendMotor(drive1Adress, I2CBusId, motorOn,motorPlus);
                 drives[0].UnrolledCableLength = RefreshDrive(drive1Adress, I2CBusId);
                 Console.WriteLine(drives[0].UnrolledCableLength);
                 Thread.Sleep(500);
                 motorOn = false;
             }            
-            SendMotor(drive1Adress, I2CBusId, motorOn);
+            SendMotor(drive1Adress, I2CBusId, motorOn, motorPlus);
 
         }
         private static double RefreshDrive(int arduinoAddress, int I2CBusId)
@@ -45,12 +54,17 @@ namespace Startup
             return cableLenght;
             
         }
-        private static void SendMotor(int I2CBusId, int address, bool motorOn)
+        private static void SendMotor(int I2CBusId, int address, bool motorOn, bool motorPlus)
         {
             var connectionSettings = new I2cConnectionSettings(I2CBusId, address);
             I2cDevice i2cDevice = I2cDevice.Create(connectionSettings);
-            byte[] dataToSend = new byte[] { motorOn ? (byte)1 : (byte)0 };
-            i2cDevice.Write(dataToSend);
+            byte dataToSend = 0;
+            if (motorOn) dataToSend |= 0x01; // Setze Bit 0 für command1
+            if (motorPlus) dataToSend |= 0x02; // Setze Bit 1 für command2
+
+            // Daten senden
+            i2cDevice.Write(new byte[] { dataToSend });
+
 
         }
         private static int GetCounterValue(int I2CBusId, int address)
