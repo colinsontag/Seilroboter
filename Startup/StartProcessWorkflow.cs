@@ -16,6 +16,7 @@ namespace Startup
 
         internal static void Start(List<Drive> drives, MachinePoint tCP)
         {
+            const double angleDistance = 3.2725;
             const int I2CBusId = 1;
             const int drive1Adress = 9;
             const int drive2Adress = 10;
@@ -24,13 +25,13 @@ namespace Startup
             I2cDevice i2cDevice = I2cDevice.Create(connectionSettings);
             bool motorOn = false;
             bool motorPlus = false;
-            drives[0].UnrolledCableLength = RefreshDrive(i2cDevice, drive1Adress, I2CBusId);
+            drives[0].UnrolledCableLength = RefreshDrive(i2cDevice, drive1Adress, I2CBusId,angleDistance);
             Console.WriteLine(drives[0].UnrolledCableLength);
 
             double cableLenghtToReach = 150;
             while (cableLenghtToReach != 666)
             {
-                while (Math.Abs(drives[0].UnrolledCableLength - cableLenghtToReach) > 1)
+                while (Math.Abs(drives[0].UnrolledCableLength - cableLenghtToReach) >= angleDistance)
                 {
                     motorOn = true;
                     if (drives[0].UnrolledCableLength < cableLenghtToReach)
@@ -42,9 +43,9 @@ namespace Startup
                         motorPlus = false;
                     }
                     SendMotor(i2cDevice, motorOn, motorPlus);
-                    drives[0].UnrolledCableLength = RefreshDrive(i2cDevice, drive1Adress, I2CBusId);
+                    drives[0].UnrolledCableLength = RefreshDrive(i2cDevice, drive1Adress, I2CBusId,angleDistance);
                     Console.WriteLine(drives[0].UnrolledCableLength);
-                    Thread.Sleep(500);
+                    
                     motorOn = false;
                 }
                 SendMotor(i2cDevice, motorOn, motorPlus);
@@ -52,12 +53,12 @@ namespace Startup
                 cableLenghtToReach = Convert.ToDouble(Console.ReadLine());
             }
         }
-        private static double RefreshDrive(I2cDevice i2cDevice, int arduinoAddress, int I2CBusId)
+        private static double RefreshDrive(I2cDevice i2cDevice, int arduinoAddress, int I2CBusId, double angleDistance)
         {
             var counterValue = GetCounterValue(i2cDevice);
             Console.WriteLine($"Daten von Arduino {arduinoAddress}: {counterValue}");
 
-            var cableLenght = counterValue * 3.2725;
+            var cableLenght = counterValue * angleDistance;
             return cableLenght;
         }
         private static void SendMotor(I2cDevice i2cDevice, bool motorOn, bool motorPlus)
