@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Device.I2c;
+using System.Net;
 
 namespace Startup
 {
@@ -19,37 +20,44 @@ namespace Startup
             const int drive1Adress = 9;
             const int drive2Adress = 10;
             const int drive3Adress = 11;
-            int[] arduinoAddresses = { drive1Adress, drive2Adress, drive3Adress };
-            RefreshDrives(drives, arduinoAddresses, I2CBusId);
+            bool motorOn = false;
+            drives[0].UnrolledCableLength = RefreshDrive(drive1Adress, I2CBusId);
             Console.WriteLine(drives[0].UnrolledCableLength);
-            while (true)
+            double cableLenghtToReach = 150;
+            while (drives[0].UnrolledCableLength >= cableLenghtToReach)
             {
-                RefreshDrives(drives, arduinoAddresses, I2CBusId);
+                motorOn = true;
+                SendMotor(drive1Adress, I2CBusId, motorOn);
+                drives[0].UnrolledCableLength = RefreshDrive(drive1Adress, I2CBusId);
                 Console.WriteLine(drives[0].UnrolledCableLength);
                 Thread.Sleep(500);
-            }
+                motorOn = false;
+            }            
+            SendMotor(drive1Adress, I2CBusId, motorOn);
 
         }
-        private static void RefreshDrives(List<Drive> drives, int[] arduinoAddresses, int I2CBusId)
+        private static double RefreshDrive(int arduinoAddress, int I2CBusId)
         {
-            foreach (int address in arduinoAddresses)
-            {
-                var counterValue = GetCounterValue(I2CBusId, address);
-                Console.WriteLine($"Daten von Arduino {address}: {counterValue}");
-                if (address == 9)
-                {
-                    drives[0].UnrolledCableLength = counterValue * ((15 / 360) * 78.54);
-                }
-            }
+            var counterValue = GetCounterValue(I2CBusId, arduinoAddress);
+            Console.WriteLine($"Daten von Arduino {arduinoAddress}: {counterValue}");
             
+            var cableLenght = counterValue * 3.2725;
+            return cableLenght;
+            
+        }
+        private static void SendMotor(int I2CBusId, int address, bool motorOn)
+        {
+            var connectionSettings = new I2cConnectionSettings(I2CBusId, address);
+            I2cDevice i2cDevice = I2cDevice.Create(connectionSettings);
+            byte[] dataToSend = new byte[] { motorOn ? (byte)1 : (byte)0 };
+            i2cDevice.Write(dataToSend);
 
         }
         private static int GetCounterValue(int I2CBusId, int address)
         {
             var connectionSettings = new I2cConnectionSettings(I2CBusId, address);
-
-
             I2cDevice i2cDevice = I2cDevice.Create(connectionSettings);
+
             byte[] receiveBuffer = new byte[4];
 
             i2cDevice.Read(receiveBuffer);
