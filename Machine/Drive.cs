@@ -5,7 +5,7 @@ namespace Machine
     {
         public string Name { get; set; }
         public Point3D MountPosition { get; set; }
-        public float UnrolledCableLength { get; set; }
+        public double UnrolledCableLength { get; set; }
         
         public Drive(string name,Point3D mountPosition,float unrolledCableLength)
         {

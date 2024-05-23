@@ -12,7 +12,7 @@ namespace Startup
 {
     internal static class StartProcessWorkflow
     {
-        private static bool askForCounterValues = true;
+
         internal static void Start(List<Drive> drives, MachinePoint tCP)
         {
             const int I2CBusId = 1;
@@ -20,26 +20,23 @@ namespace Startup
             const int drive2Adress = 10;
             const int drive3Adress = 11;
             int[] arduinoAddresses = { drive1Adress, drive2Adress, drive3Adress };
-            while (askForCounterValues)
+            RefreshDrives(drives, arduinoAddresses, I2CBusId);
+            Console.WriteLine(drives[0].UnrolledCableLength);
+
+
+        }
+        private static void RefreshDrives(List<Drive> drives, int[] arduinoAddresses, int I2CBusId)
+        {
+            foreach (int address in arduinoAddresses)
             {
-                foreach (int address in arduinoAddresses)
+                var counterValue = GetCounterValue(I2CBusId, address);
+                Console.WriteLine($"Daten von Arduino {address}: {counterValue}");
+                if (address == 9)
                 {
-                    var counterValue = GetCounterValue(I2CBusId, address);
-                    Console.WriteLine($"Daten von Arduino {address}: {counterValue}");
-                    switch (address)
-                    {                        
-                        case drive1Adress:                            
-                            break;
-                        case drive2Adress:
-                            break;
-                        case drive3Adress:
-                            break;
-                        default:
-                            break;
-                    }                    
-                    Thread.Sleep(500);
+                    drives[0].UnrolledCableLength = counterValue * ((15 / 360) * 78.54);
                 }
             }
+            
 
         }
         private static int GetCounterValue(int I2CBusId, int address)
