@@ -22,7 +22,12 @@ namespace Startup
             int[] arduinoAddresses = { drive1Adress, drive2Adress, drive3Adress };
             RefreshDrives(drives, arduinoAddresses, I2CBusId);
             Console.WriteLine(drives[0].UnrolledCableLength);
-
+            while (true)
+            {
+                RefreshDrives(drives, arduinoAddresses, I2CBusId);
+                Console.WriteLine(drives[0].UnrolledCableLength);
+                Thread.Sleep(500);
+            }
 
         }
         private static void RefreshDrives(List<Drive> drives, int[] arduinoAddresses, int I2CBusId)
