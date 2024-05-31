@@ -12,8 +12,9 @@ namespace Startup
             var drives = new List<Drive>();
             var pointList = new List<MachinePoint>();
             string pathToConfig = "";
-            InitProcessWorkflow.Start(pathToConfig,out drives, out pointList);
+            string pathToPointList = "";
 
+            InitProcessWorkflow.Start(pathToConfig, pathToPointList, out drives, out pointList);
             SingleTCPProcess.Start(drives, pointList);
         }
 

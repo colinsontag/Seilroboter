@@ -11,7 +11,7 @@ namespace Startup
 {
     internal static class InitProcessWorkflow
     {
-        internal static void Start(string pathToConfigFile,out List<Drive> drives,out List<MachinePoint> pointList)
+        internal static void Start(string pathToConfigFile, string pathToPointList, out List<Drive> drives,out List<MachinePoint> pointList)
         {
             RobotConfig InitialRobotConfig = ConfigTools.LoadFromXML(@pathToConfigFile);
             //RobotConfig InitialRobotConfig = ConfigTools.LoadFromXML(@"/home/colin/Documents/Seilroboter/Seilroboter/ConfigManger/RobotConfig.xml");
