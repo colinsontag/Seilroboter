@@ -11,10 +11,10 @@ using System.Net;
 
 namespace Startup
 {
-    internal static class StartProcessWorkflow
+    internal static class SingleTCPProcess
     {
 
-        internal static void Start(List<Drive> drives, MachinePoint tCP)
+        internal static void Start(List<Drive> drives, List<MachinePoint> pointList)
         {
             const double angleDistance = 3.2725;
             const int I2CBusId = 1;
@@ -65,7 +65,7 @@ namespace Startup
         {
             byte dataToSend = 0;
             if (motorOn) dataToSend |= 0x01; // Setze Bit 0 für command1
-            if (motorPlus) dataToSend |= 0x02; // Setze Bit 1 für command2
+            if (motorPlus) dataToSend |= 0x02;
 
             // Daten senden
             i2cDevice.Write(new byte[] { dataToSend });

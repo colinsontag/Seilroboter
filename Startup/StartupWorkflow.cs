@@ -10,10 +10,11 @@ namespace Startup
         public static void Start()
         {
             var drives = new List<Drive>();
-            var tCP = new MachinePoint();
-            InitProcessWorkflow.Start(out drives, out tCP);
-            
-            StartProcessWorkflow.Start(drives, tCP);
+            var pointList = new List<MachinePoint>();
+            string pathToConfig = "";
+            InitProcessWorkflow.Start(pathToConfig,out drives, out pointList);
+
+            SingleTCPProcess.Start(drives, pointList);
         }
 
 

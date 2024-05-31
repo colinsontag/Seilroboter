@@ -11,9 +11,9 @@ namespace Startup
 {
     internal static class InitProcessWorkflow
     {
-        internal static void Start(out List<Drive> drives,out MachinePoint tCP)
+        internal static void Start(string pathToConfigFile,out List<Drive> drives,out List<MachinePoint> pointList)
         {
-            RobotConfig InitialRobotConfig = ConfigTools.LoadFromXML(@"/home/colin/Documents/Seilroboter/Seilroboter/ConfigManger/RobotConfig.xml");
+            RobotConfig InitialRobotConfig = ConfigTools.LoadFromXML(@pathToConfigFile);
             //RobotConfig InitialRobotConfig = ConfigTools.LoadFromXML(@"/home/colin/Documents/Seilroboter/Seilroboter/ConfigManger/RobotConfig.xml");
             drives = new List<Drive>
             {
@@ -21,12 +21,10 @@ namespace Startup
                 new Drive("Drive2", InitialRobotConfig.Drive2MountPosition, 0),
                 new Drive("Drive3", InitialRobotConfig.Drive3MountPosition, 0)
             };
+            pointList = new List<MachinePoint>();
 
-            tCP = new MachinePoint
-            {
-                Name = "TCP",
-                Position = new Point3D(0, 0, 0)
-            };
+            
+            
         }
     }
 }
