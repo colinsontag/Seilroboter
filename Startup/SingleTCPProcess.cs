@@ -17,38 +17,47 @@ namespace Startup
         internal static void Start(List<Drive> drives, List<MachinePoint> pointList)
         {
             const double angleDistance = 3.2725;
-            const int I2CBusId = 1;
-            const int drive1Adress = 9;
-            const int drive2Adress = 10;
-            const int drive3Adress = 11;
-            var connectionSettings = new I2cConnectionSettings(I2CBusId, drive1Adress);
-            I2cDevice i2cDevice = I2cDevice.Create(connectionSettings);
+            const int I2CBusIdController = 1;
             bool motorOn = false;
             bool motorPlus = false;
-            drives[0].UnrolledCableLength = RefreshDrive(i2cDevice, drive1Adress, I2CBusId,angleDistance);
-            Console.WriteLine(drives[0].UnrolledCableLength);
+            List<I2cDevice> i2cDevices = new List<I2cDevice>();
+            for (int i = 0; i < drives.Count - 1; i++)
+            {
+                var connectionSettings = new I2cConnectionSettings(I2CBusIdController, drives[i].I2CBusId);
+                var device = I2cDevice.Create(connectionSettings);
+                i2cDevices.Add(device);
+                drives[i].UnrolledCableLength = RefreshDrive(device, device.ConnectionSettings.DeviceAddress, device.ConnectionSettings.BusId, angleDistance);
+            }
+
+            foreach (Drive drive in drives)
+            {
+                Console.WriteLine(drive.UnrolledCableLength.ToString());
+            }
 
             double cableLenghtToReach = 150;
             while (cableLenghtToReach != 666)
             {
-                while (Math.Abs(drives[0].UnrolledCableLength - cableLenghtToReach) >= angleDistance)
+                for (int i = 0; i < i2cDevices.Count -1; i++)
                 {
-                    motorOn = true;
-                    if (drives[0].UnrolledCableLength < cableLenghtToReach)
+                    while (Math.Abs(drives[i].UnrolledCableLength - cableLenghtToReach) >= angleDistance)
                     {
-                        motorPlus = true;
+                        motorOn = true;
+                        if (drives[i].UnrolledCableLength < cableLenghtToReach)
+                        {
+                            motorPlus = true;
+                        }
+                        else
+                        {
+                            motorPlus = false;
+                        }
+                        SendMotor(i2cDevices.ToArray()[i], motorOn, motorPlus);
+                        drives[0].UnrolledCableLength = RefreshDrive(i2cDevices.ToArray()[i], drives[i].I2CBusId, I2CBusIdController, angleDistance);
+                        Console.WriteLine(drives[0].UnrolledCableLength);
+
+                        motorOn = false;
+                        SendMotor(i2cDevices.ToArray()[i], motorOn, motorPlus);
                     }
-                    else
-                    {
-                        motorPlus = false;
-                    }
-                    SendMotor(i2cDevice, motorOn, motorPlus);
-                    drives[0].UnrolledCableLength = RefreshDrive(i2cDevice, drive1Adress, I2CBusId,angleDistance);
-                    Console.WriteLine(drives[0].UnrolledCableLength);
-                    
-                    motorOn = false;
-                }
-                SendMotor(i2cDevice, motorOn, motorPlus);
+                }                
                 Console.WriteLine("Neue Laenge Eingeben");
                 cableLenghtToReach = Convert.ToDouble(Console.ReadLine());
             }
