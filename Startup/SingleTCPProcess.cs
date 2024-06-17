@@ -41,50 +41,18 @@ namespace Startup
                 {
                     while (Math.Abs(drives[i].UnrolledCableLength - cableLenghtToReach) >= angleDistance)
                     {
-                        motorOn = true;
-                        if (drives[i].UnrolledCableLength < cableLenghtToReach)
-                        {
-                            motorPlus = true;
-                        }
-                        else
-                        {
-                            motorPlus = false;
-                        }
-                        SendMotor(i2cDevices.ToArray()[i], motorOn, motorPlus);
-                        drives[0].UnrolledCableLength = RefreshDrive(i2cDevices.ToArray()[i], drives[i].I2CBusId, I2CBusIdController, angleDistance);
-                        Console.WriteLine(drives[0].UnrolledCableLength);
-
-                        motorOn = false;
-                        SendMotor(i2cDevices.ToArray()[i], motorOn, motorPlus);
+                        ChangeDriveCabelLenght(drives, angleDistance, I2CBusIdController, i2cDevices, cableLenghtToReach, i);
                     }
+                    motorOn = false;
+                    SendMotor(i2cDevices.ToArray()[i], motorOn, motorPlus);
                 }                
                 Console.WriteLine("Neue Laenge Eingeben");
                 cableLenghtToReach = Convert.ToDouble(Console.ReadLine());
             }
         }
-        private static double RefreshDrive(I2cDevice i2cDevice, int arduinoAddress, int I2CBusId, double angleDistance)
-        {
-            var counterValue = GetCounterValue(i2cDevice);
-            Console.WriteLine($"Daten von Arduino {arduinoAddress}: {counterValue}");
 
-            var cableLenght = counterValue * angleDistance;
-            return cableLenght;
-        }
-        private static void SendMotor(I2cDevice i2cDevice, bool motorOn, bool motorPlus)
-        {
-            byte dataToSend = 0;
-            if (motorOn) dataToSend |= 0x01; // Setze Bit 0 für command1
-            if (motorPlus) dataToSend |= 0x02;
+        
 
-            // Daten senden
-            i2cDevice.Write(new byte[] { dataToSend });
-        }
-        private static int GetCounterValue(I2cDevice i2cDevice)
-        {
-            byte[] receiveBuffer = new byte[4];
-            i2cDevice.Read(receiveBuffer);
-            Array.Reverse(receiveBuffer);
-            return BitConverter.ToInt32(receiveBuffer, 0);
-        }
+       
     }
 }
