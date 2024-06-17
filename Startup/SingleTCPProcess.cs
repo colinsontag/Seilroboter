@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Device.I2c;
 using System.Net;
+using I2C_Receive;
 
 
 namespace Startup
@@ -24,8 +25,7 @@ namespace Startup
             List<I2cDevice> i2cDevices = new List<I2cDevice>();
             for (int i = 0; i < drives.Count - 1; i++)
             {
-                var connectionSettings = new I2cConnectionSettings(I2CBusIdController, drives[i].I2CBusId);
-                var device = I2cDevice.Create(connectionSettings);
+                I2cDevice device = I2CConnectUtil.CreateI2CDevice(drives, I2CBusIdController, i);
                 i2cDevices.Add(device);
                 drives[i].UnrolledCableLength = DriveInteraction.RefreshDrive(device, device.ConnectionSettings.DeviceAddress, device.ConnectionSettings.BusId, angleDistance);
             }
@@ -53,7 +53,5 @@ namespace Startup
         }
 
         
-
-       
     }
 }
