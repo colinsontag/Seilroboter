@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Device.I2c;
 using System.Net;
 
+
 namespace Startup
 {
     internal static class SingleTCPProcess
@@ -26,7 +27,7 @@ namespace Startup
                 var connectionSettings = new I2cConnectionSettings(I2CBusIdController, drives[i].I2CBusId);
                 var device = I2cDevice.Create(connectionSettings);
                 i2cDevices.Add(device);
-                drives[i].UnrolledCableLength = RefreshDrive(device, device.ConnectionSettings.DeviceAddress, device.ConnectionSettings.BusId, angleDistance);
+                drives[i].UnrolledCableLength = DriveInteraction.RefreshDrive(device, device.ConnectionSettings.DeviceAddress, device.ConnectionSettings.BusId, angleDistance);
             }
 
             foreach (Drive drive in drives)
@@ -41,10 +42,10 @@ namespace Startup
                 {
                     while (Math.Abs(drives[i].UnrolledCableLength - cableLenghtToReach) >= angleDistance)
                     {
-                        ChangeDriveCabelLenght(drives, angleDistance, I2CBusIdController, i2cDevices, cableLenghtToReach, i);
+                        DriveInteraction.ChangeDriveCabelLenght(drives, angleDistance, I2CBusIdController, i2cDevices, cableLenghtToReach, i);
                     }
                     motorOn = false;
-                    SendMotor(i2cDevices.ToArray()[i], motorOn, motorPlus);
+                    DriveInteraction.SendMotor(i2cDevices.ToArray()[i], motorOn, motorPlus);
                 }                
                 Console.WriteLine("Neue Laenge Eingeben");
                 cableLenghtToReach = Convert.ToDouble(Console.ReadLine());
