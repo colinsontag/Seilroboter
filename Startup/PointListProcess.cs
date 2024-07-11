@@ -10,12 +10,10 @@ using System.Device.I2c;
 using System.Net;
 using I2C_Receive;
 
-
 namespace Startup
 {
     internal static class PointListProcess
     {
-
         internal static void Start(List<Drive> drives, List<MachinePoint> pointList)
         {
             const double angleDistance = 3.2725;
@@ -40,18 +38,23 @@ namespace Startup
             {
                 Parallel.For(0, i2cDevices.Count - 1, i =>
                 {
-                    while (Math.Abs(drives[i].UnrolledCableLength - cableLenghtToReach) >= angleDistance)
+                    try
                     {
-                        DriveInteraction.ChangeDriveCabelLenght(drives, angleDistance, I2CBusIdController, i2cDevices, cableLenghtToReach, i);
+                        while (Math.Abs(drives[i].UnrolledCableLength - cableLenghtToReach) >= angleDistance)
+                        {
+                            DriveInteraction.ChangeDriveCabelLenght(drives, angleDistance, I2CBusIdController, i2cDevices, cableLenghtToReach, i);
+                        }
+                        motorOn = false;
+                        DriveInteraction.SendMotor(i2cDevices.ToArray()[i], motorOn, motorPlus);
                     }
-                    motorOn = false;
-                    DriveInteraction.SendMotor(i2cDevices.ToArray()[i], motorOn, motorPlus);
+                    catch (Exception)
+                    {
+                        throw;
+                    }
                 });
                 Console.WriteLine("Neue Laenge Eingeben");
                 cableLenghtToReach = Convert.ToDouble(Console.ReadLine());
             }
         }
-
-
     }
 }
