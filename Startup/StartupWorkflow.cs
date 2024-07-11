@@ -15,7 +15,7 @@ namespace Startup
             string pathToPointList = "";
 
             InitProcessWorkflow.Start(pathToConfig, pathToPointList, out drives, out pointList);
-            SingleTCPProcess.Start(drives, pointList);
+            PointListProcess.Start(drives, pointList);
         }
 
 

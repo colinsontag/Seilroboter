@@ -13,7 +13,7 @@ using I2C_Receive;
 
 namespace Startup
 {
-    internal static class SingleTCPProcess
+    internal static class PointListProcess
     {
 
         internal static void Start(List<Drive> drives, List<MachinePoint> pointList)
@@ -38,7 +38,7 @@ namespace Startup
             double cableLenghtToReach = 150;
             while (cableLenghtToReach != 666)
             {
-                for (int i = 0; i < i2cDevices.Count -1; i++)
+                Parallel.For(0, i2cDevices.Count - 1, i =>
                 {
                     while (Math.Abs(drives[i].UnrolledCableLength - cableLenghtToReach) >= angleDistance)
                     {
@@ -46,12 +46,12 @@ namespace Startup
                     }
                     motorOn = false;
                     DriveInteraction.SendMotor(i2cDevices.ToArray()[i], motorOn, motorPlus);
-                }                
+                });
                 Console.WriteLine("Neue Laenge Eingeben");
                 cableLenghtToReach = Convert.ToDouble(Console.ReadLine());
             }
         }
 
-        
+
     }
 }
