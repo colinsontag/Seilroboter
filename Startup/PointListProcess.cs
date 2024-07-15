@@ -23,6 +23,7 @@ namespace Startup
             List<I2cDevice> i2cDevices = new List<I2cDevice>();
             for (int i = 0; i < drives.Count - 1; i++)
             {
+                Console.WriteLine(drives[i].I2CBusId);
                 I2cDevice device = I2CConnectUtil.CreateI2CDevice(drives, I2CBusIdController, i);
                 i2cDevices.Add(device);
                 drives[i].UnrolledCableLength = DriveInteraction.RefreshDrive(device, device.ConnectionSettings.DeviceAddress, device.ConnectionSettings.BusId, angleDistance);
