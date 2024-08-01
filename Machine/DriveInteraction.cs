@@ -57,6 +57,7 @@ namespace Machine
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine("Attempts: " + attempts);
                     attempts++;
                     if (attempts >= retryCount)
                     {
