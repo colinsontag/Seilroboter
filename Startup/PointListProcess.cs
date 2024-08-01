@@ -49,8 +49,7 @@ namespace Startup
                 foreach (Drive drive in drives)
                 {
                     if (Math.Abs(drive.UnrolledCableLength - cableLenghtToReach) >= angleDistance)
-                    {
-                        Console.WriteLine("Start Changeing Cable Lenght");
+                    {                       
                         Console.WriteLine(drive.I2CBusId + ":" + Math.Abs(drive.UnrolledCableLength - cableLenghtToReach));
                         if (drive.I2CBusId == i2cDevice1.ConnectionSettings.DeviceAddress)
                         {
