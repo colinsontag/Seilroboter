@@ -51,6 +51,7 @@ namespace Startup
                     if (Math.Abs(drive.UnrolledCableLength - cableLenghtToReach) >= angleDistance)
                     {
                         Console.WriteLine("Start Changeing Cable Lenght");
+                        Console.WriteLine(drive.I2CBusId + "  \\  " + i2cDevice1.ConnectionSettings.BusId);
                         if (drive.I2CBusId == i2cDevice1.ConnectionSettings.BusId)
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice1, cableLenghtToReach);
