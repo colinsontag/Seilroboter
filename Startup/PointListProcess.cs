@@ -40,7 +40,7 @@ namespace Startup
 
             foreach (Drive drive in drives)
             {
-                Console.WriteLine(drive.UnrolledCableLength.ToString());
+                Console.WriteLine($"Drive {drive.I2CBusId}:" + drive.UnrolledCableLength.ToString());
             }
 
             double cableLenghtToReach = 150;
