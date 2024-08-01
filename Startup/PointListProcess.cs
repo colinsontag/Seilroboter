@@ -49,19 +49,22 @@ namespace Startup
                 foreach (Drive drive in drives)
                 {
                     if (Math.Abs(drive.UnrolledCableLength - cableLenghtToReach) >= angleDistance)
-                    {                       
+                    {
                         Console.WriteLine(drive.I2CBusId + ":" + Math.Abs(drive.UnrolledCableLength - cableLenghtToReach));
                         if (drive.I2CBusId == i2cDevice1.ConnectionSettings.DeviceAddress)
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice1, cableLenghtToReach);
+                            Thread.Sleep(500);
                         }
                         else if (drive.I2CBusId == i2cDevice2.ConnectionSettings.DeviceAddress)
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice2, cableLenghtToReach);
+                            Thread.Sleep(500);
                         }
                         else if (drive.I2CBusId == i2cDevice3.ConnectionSettings.DeviceAddress)
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice3, cableLenghtToReach);
+                            Thread.Sleep(500);
                         }
                     }
                 }
