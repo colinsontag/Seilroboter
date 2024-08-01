@@ -71,9 +71,13 @@ namespace Startup
             }
             motorOn = false;
             Console.WriteLine("Start Disabling Motors");
+            Thread.Sleep(500);
             DriveInteraction.SendMotor(i2cDevice1, motorOn, motorPlus);
+            Thread.Sleep(500);
             DriveInteraction.SendMotor(i2cDevice2, motorOn, motorPlus);
+            Thread.Sleep(500);
             DriveInteraction.SendMotor(i2cDevice3, motorOn, motorPlus);
+
             Console.WriteLine("Neue Laenge Eingeben");
             cableLenghtToReach = Convert.ToDouble(Console.ReadLine());
         }
