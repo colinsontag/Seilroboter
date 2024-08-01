@@ -52,15 +52,15 @@ namespace Startup
                     {
                         Console.WriteLine("Start Changeing Cable Lenght");
                         Console.WriteLine(drive.I2CBusId + "  \\  " + i2cDevice1.ConnectionSettings.BusId);
-                        if (drive.I2CBusId == i2cDevice1.ConnectionSettings.BusId)
+                        if (drive.I2CBusId == i2cDevice1.ConnectionSettings.DeviceAddress)
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice1, cableLenghtToReach);
                         }
-                        else if (drive.I2CBusId == i2cDevice2.ConnectionSettings.BusId)
+                        else if (drive.I2CBusId == i2cDevice2.ConnectionSettings.DeviceAddress)
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice2, cableLenghtToReach);
                         }
-                        else if (drive.I2CBusId == i2cDevice3.ConnectionSettings.BusId)
+                        else if (drive.I2CBusId == i2cDevice3.ConnectionSettings.DeviceAddress)
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice3, cableLenghtToReach);
                         }
