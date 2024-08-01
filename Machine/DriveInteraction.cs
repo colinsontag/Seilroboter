@@ -74,7 +74,31 @@ namespace Machine
             Console.WriteLine("GetCounterValue Start");
             Console.WriteLine(i2cDevice.ConnectionSettings.BusId + " - " + i2cDevice.ConnectionSettings.DeviceAddress);
             byte[] receiveBuffer = new byte[4];
-            i2cDevice.Read(receiveBuffer);
+
+            int retryCount = 5;
+            // Daten senden
+            // Attempt to send data, retrying if an error occurs
+            int attempts = 0;
+            bool success = false;
+            while (attempts < retryCount && !success)
+            {
+                try
+                {
+                    i2cDevice.Read(receiveBuffer);
+                    success = true; // If no exception, mark as successful
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Attempts: " + attempts);
+                    attempts++;
+                    if (attempts >= retryCount)
+                    {
+                        throw new Exception($"Failed to recive I2C data after {retryCount} attempts.", ex);
+                    }
+                    // Optionally, you can log the exception or wait for some time before retrying
+                    System.Threading.Thread.Sleep(100); // Wait for 100 ms before retrying
+                }
+            }
             Console.WriteLine("GetCounterValue After");
             Array.Reverse(receiveBuffer);
             return BitConverter.ToInt32(receiveBuffer, 0);
