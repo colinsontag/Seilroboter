@@ -11,7 +11,6 @@ namespace Machine
     {
         public static void ChangeDriveCabelLenght(Drive drive, double angleDistance, int I2CBusIdController, I2cDevice i2cDevice, double cableLenghtToReach)
         {
-            
             bool motorOn = true;
             bool motorPlus = false;
             if (drive.UnrolledCableLength < cableLenghtToReach)
@@ -38,15 +37,35 @@ namespace Machine
 
         public static void SendMotor(I2cDevice i2cDevice, bool motorOn, bool motorPlus)
         {
-            
             byte dataToSend = 0;
             if (motorOn) dataToSend |= 0x01; // Setze Bit 0 für command1
             if (motorPlus) dataToSend |= 0x02;
 
             // Daten senden
-            
-            i2cDevice.Write(new byte[] { dataToSend });
-            
+
+            int retryCount = 5;
+            // Daten senden
+            // Attempt to send data, retrying if an error occurs
+            int attempts = 0;
+            bool success = false;
+            while (attempts < retryCount && !success)
+            {
+                try
+                {
+                    i2cDevice.Write(new byte[] { dataToSend });
+                    success = true; // If no exception, mark as successful
+                }
+                catch (Exception ex)
+                {
+                    attempts++;
+                    if (attempts >= retryCount)
+                    {
+                        throw new Exception($"Failed to send I2C data after {retryCount} attempts.", ex);
+                    }
+                    // Optionally, you can log the exception or wait for some time before retrying
+                    System.Threading.Thread.Sleep(100); // Wait for 100 ms before retrying
+                }
+            }
         }
 
         public static int GetCounterValue(I2cDevice i2cDevice)
