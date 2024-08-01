@@ -44,7 +44,9 @@ namespace Machine
             if (motorPlus) dataToSend |= 0x02;
 
             // Daten senden
+            Console.WriteLine("SendMotor Before Write");
             i2cDevice.Write(new byte[] { dataToSend });
+            Console.WriteLine("SendMotor After Write");
         }
 
         public static int GetCounterValue(I2cDevice i2cDevice)

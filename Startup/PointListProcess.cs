@@ -40,7 +40,7 @@ namespace Startup
 
             foreach (Drive drive in drives)
             {
-                Console.WriteLine($"Drive {drive.I2CBusId}:" + drive.UnrolledCableLength.ToString());
+                Console.WriteLine($"Drive I2C:{drive.I2CBusId}:" + drive.UnrolledCableLength.ToString());
             }
 
             double cableLenghtToReach = 150;
@@ -50,6 +50,7 @@ namespace Startup
                 {
                     if (Math.Abs(drive.UnrolledCableLength - cableLenghtToReach) >= angleDistance)
                     {
+                        Console.WriteLine("Start Changeing Cable Lenght");
                         if (drive.I2CBusId == i2cDevice1.ConnectionSettings.BusId)
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice1, cableLenghtToReach);
@@ -65,6 +66,7 @@ namespace Startup
                     }
                 }
                 motorOn = false;
+                Console.WriteLine("Start Disabling Motors");
                 DriveInteraction.SendMotor(i2cDevice1, motorOn, motorPlus);
                 DriveInteraction.SendMotor(i2cDevice2, motorOn, motorPlus);
                 DriveInteraction.SendMotor(i2cDevice3, motorOn, motorPlus);
