@@ -9,12 +9,12 @@ namespace Machine
 {
     public static class DriveInteraction
     {
-        public static void ChangeDriveCabelLenght(List<Drive> drives, double angleDistance, int I2CBusIdController, List<I2cDevice> i2cDevices, double cableLenghtToReach, int i)
+        public static void ChangeDriveCabelLenght(Drive drive, double angleDistance, int I2CBusIdController, I2cDevice i2cDevice, double cableLenghtToReach)
         {
             Console.WriteLine("ChangeDriveCabelLenght Start");
             bool motorOn = true;
             bool motorPlus = false;
-            if (drives[i].UnrolledCableLength < cableLenghtToReach)
+            if (drive.UnrolledCableLength < cableLenghtToReach)
             {
                 motorPlus = true;
             }
@@ -22,10 +22,11 @@ namespace Machine
             {
                 motorPlus = false;
             }
-            SendMotor(i2cDevices.ToArray()[i], motorOn, motorPlus);
-            drives[0].UnrolledCableLength = RefreshDrive(i2cDevices.ToArray()[i], drives[i].I2CBusId, I2CBusIdController, angleDistance);
-            Console.WriteLine(drives[0].UnrolledCableLength);
+            SendMotor(i2cDevice, motorOn, motorPlus);
+            drive.UnrolledCableLength = RefreshDrive(i2cDevice, drive.I2CBusId, I2CBusIdController, angleDistance);
+            Console.WriteLine(drive.UnrolledCableLength);
         }
+
         public static double RefreshDrive(I2cDevice i2cDevice, int arduinoAddress, int I2CBusId, double angleDistance)
         {
             var counterValue = GetCounterValue(i2cDevice);
@@ -34,6 +35,7 @@ namespace Machine
             var cableLenght = counterValue * angleDistance;
             return cableLenght;
         }
+
         public static void SendMotor(I2cDevice i2cDevice, bool motorOn, bool motorPlus)
         {
             Console.WriteLine("SendMotor Start");
@@ -44,10 +46,11 @@ namespace Machine
             // Daten senden
             i2cDevice.Write(new byte[] { dataToSend });
         }
+
         public static int GetCounterValue(I2cDevice i2cDevice)
         {
             Console.WriteLine("GetCounterValue Start");
-            Console.WriteLine(i2cDevice.ConnectionSettings.BusId + " - " +i2cDevice.ConnectionSettings.DeviceAddress);
+            Console.WriteLine(i2cDevice.ConnectionSettings.BusId + " - " + i2cDevice.ConnectionSettings.DeviceAddress);
             byte[] receiveBuffer = new byte[4];
             i2cDevice.Read(receiveBuffer);
             Console.WriteLine("GetCounterValue After");

@@ -20,14 +20,23 @@ namespace Startup
             const int I2CBusIdController = 1;
             bool motorOn = false;
             bool motorPlus = false;
-            List<I2cDevice> i2cDevices = new List<I2cDevice>();
-            for (int i = 0; i < drives.Count - 1; i++)
-            {
-                Console.WriteLine(drives[i].I2CBusId);
-                I2cDevice device = I2CConnectUtil.CreateI2CDevice(drives, I2CBusIdController, i);
-                i2cDevices.Add(device);
-                drives[i].UnrolledCableLength = DriveInteraction.RefreshDrive(device, device.ConnectionSettings.DeviceAddress, device.ConnectionSettings.BusId, angleDistance);
-            }
+            // I2C-Bus-Nummer (1 für Raspberry Pi)
+            const int busId = 1;
+
+            // I2C-Adressen der Arduinos
+            const int arduinoAddress1 = 0x08;
+            const int arduinoAddress2 = 0x09;
+            const int arduinoAddress3 = 0x0A;
+
+            // Initialisiere I2C-Verbindung zu jedem Arduino
+            var i2cSettings1 = new I2cConnectionSettings(busId, arduinoAddress1);
+            var i2cDevice1 = I2cDevice.Create(i2cSettings1);
+
+            var i2cSettings2 = new I2cConnectionSettings(busId, arduinoAddress2);
+            var i2cDevice2 = I2cDevice.Create(i2cSettings2);
+
+            var i2cSettings3 = new I2cConnectionSettings(busId, arduinoAddress3);
+            var i2cDevice3 = I2cDevice.Create(i2cSettings3);
 
             foreach (Drive drive in drives)
             {
@@ -37,25 +46,31 @@ namespace Startup
             double cableLenghtToReach = 150;
             while (cableLenghtToReach != 666)
             {
-                Parallel.For(0, i2cDevices.Count - 1, i =>
+                foreach (Drive drive in drives)
                 {
-                    try
+                    if (Math.Abs(drive.UnrolledCableLength - cableLenghtToReach) >= angleDistance)
                     {
-                        while (Math.Abs(drives[i].UnrolledCableLength - cableLenghtToReach) >= angleDistance)
+                        if (drive.I2CBusId == i2cDevice1.ConnectionSettings.BusId)
                         {
-                            DriveInteraction.ChangeDriveCabelLenght(drives, angleDistance, I2CBusIdController, i2cDevices, cableLenghtToReach, i);
+                            DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice1, cableLenghtToReach);
                         }
-                        motorOn = false;
-                        DriveInteraction.SendMotor(i2cDevices.ToArray()[i], motorOn, motorPlus);
+                        else if (drive.I2CBusId == i2cDevice2.ConnectionSettings.BusId)
+                        {
+                            DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice2, cableLenghtToReach);
+                        }
+                        else if (drive.I2CBusId == i2cDevice3.ConnectionSettings.BusId)
+                        {
+                            DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice3, cableLenghtToReach);
+                        }
                     }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                });
-                Console.WriteLine("Neue Laenge Eingeben");
-                cableLenghtToReach = Convert.ToDouble(Console.ReadLine());
+                }
+                motorOn = false;
+                DriveInteraction.SendMotor(i2cDevice1, motorOn, motorPlus);
+                DriveInteraction.SendMotor(i2cDevice2, motorOn, motorPlus);
+                DriveInteraction.SendMotor(i2cDevice3, motorOn, motorPlus);
             }
+            Console.WriteLine("Neue Laenge Eingeben");
+            cableLenghtToReach = Convert.ToDouble(Console.ReadLine());
         }
     }
 }
