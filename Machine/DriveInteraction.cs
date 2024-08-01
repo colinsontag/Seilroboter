@@ -40,12 +40,7 @@ namespace Machine
             byte dataToSend = 0;
             if (motorOn) dataToSend |= 0x01; // Setze Bit 0 für command1
             if (motorPlus) dataToSend |= 0x02;
-
-            // Daten senden
-
             int retryCount = 5;
-            // Daten senden
-            // Attempt to send data, retrying if an error occurs
             int attempts = 0;
             bool success = false;
             while (attempts < retryCount && !success)
@@ -53,7 +48,7 @@ namespace Machine
                 try
                 {
                     i2cDevice.Write(new byte[] { dataToSend });
-                    success = true; // If no exception, mark as successful
+                    success = true;
                 }
                 catch (Exception ex)
                 {
@@ -63,8 +58,7 @@ namespace Machine
                     {
                         throw new Exception($"Failed to send I2C data after {retryCount} attempts.", ex);
                     }
-                    // Optionally, you can log the exception or wait for some time before retrying
-                    System.Threading.Thread.Sleep(100); // Wait for 100 ms before retrying
+                    System.Threading.Thread.Sleep(100);
                 }
             }
         }
@@ -76,8 +70,7 @@ namespace Machine
             byte[] receiveBuffer = new byte[4];
 
             int retryCount = 5;
-            // Daten senden
-            // Attempt to send data, retrying if an error occurs
+
             int attempts = 0;
             bool success = false;
             while (attempts < retryCount && !success)
@@ -85,7 +78,7 @@ namespace Machine
                 try
                 {
                     i2cDevice.Read(receiveBuffer);
-                    success = true; // If no exception, mark as successful
+                    success = true;
                 }
                 catch (Exception ex)
                 {
@@ -95,8 +88,7 @@ namespace Machine
                     {
                         throw new Exception($"Failed to recive I2C data after {retryCount} attempts.", ex);
                     }
-                    // Optionally, you can log the exception or wait for some time before retrying
-                    System.Threading.Thread.Sleep(100); // Wait for 100 ms before retrying
+                    System.Threading.Thread.Sleep(100);
                 }
             }
             Console.WriteLine("GetCounterValue After");
