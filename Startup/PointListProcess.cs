@@ -54,28 +54,23 @@ namespace Startup
                         if (drive.I2CBusId == i2cDevice1.ConnectionSettings.DeviceAddress)
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice1, cableLenghtToReach);
-                            Thread.Sleep(500);
                         }
                         else if (drive.I2CBusId == i2cDevice2.ConnectionSettings.DeviceAddress)
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice2, cableLenghtToReach);
-                            Thread.Sleep(500);
                         }
                         else if (drive.I2CBusId == i2cDevice3.ConnectionSettings.DeviceAddress)
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, I2CBusIdController, i2cDevice3, cableLenghtToReach);
-                            Thread.Sleep(500);
                         }
                     }
                 }
             }
             motorOn = false;
             Console.WriteLine("Start Disabling Motors");
-            Thread.Sleep(500);
+
             DriveInteraction.SendMotor(i2cDevice1, motorOn, motorPlus);
-            Thread.Sleep(500);
             DriveInteraction.SendMotor(i2cDevice2, motorOn, motorPlus);
-            Thread.Sleep(500);
             DriveInteraction.SendMotor(i2cDevice3, motorOn, motorPlus);
 
             Console.WriteLine("Neue Laenge Eingeben");
