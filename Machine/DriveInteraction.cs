@@ -11,7 +11,7 @@ namespace Machine
     {
         public static void ChangeDriveCabelLenght(Drive drive, double angleDistance, int I2CBusIdController, I2cDevice i2cDevice, double cableLenghtToReach)
         {
-            Console.WriteLine("ChangeDriveCabelLenght Start");
+            
             bool motorOn = true;
             bool motorPlus = false;
             if (drive.UnrolledCableLength < cableLenghtToReach)
@@ -38,15 +38,15 @@ namespace Machine
 
         public static void SendMotor(I2cDevice i2cDevice, bool motorOn, bool motorPlus)
         {
-            Console.WriteLine("SendMotor Start");
+            
             byte dataToSend = 0;
             if (motorOn) dataToSend |= 0x01; // Setze Bit 0 für command1
             if (motorPlus) dataToSend |= 0x02;
 
             // Daten senden
-            Console.WriteLine("SendMotor Before Write");
+            
             i2cDevice.Write(new byte[] { dataToSend });
-            Console.WriteLine("SendMotor After Write");
+            
         }
 
         public static int GetCounterValue(I2cDevice i2cDevice)
