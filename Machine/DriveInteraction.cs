@@ -23,7 +23,7 @@ namespace Machine
             }
             SendMotor(i2cDevice, motorOn, motorPlus);
             drive.UnrolledCableLength = RefreshDrive(i2cDevice, drive.I2CBusId, I2CBusIdController, angleDistance);
-            Console.WriteLine(drive.UnrolledCableLength);
+            Console.WriteLine($"Drive {drive.I2CBusId} CableLenght: " + drive.UnrolledCableLength);
         }
 
         public static double RefreshDrive(I2cDevice i2cDevice, int arduinoAddress, int I2CBusId, double angleDistance)
@@ -64,9 +64,8 @@ namespace Machine
         }
 
         public static int GetCounterValue(I2cDevice i2cDevice)
-        {
-            Console.WriteLine("GetCounterValue Start");
-            Console.WriteLine(i2cDevice.ConnectionSettings.BusId + " - " + i2cDevice.ConnectionSettings.DeviceAddress);
+        {           
+            
             byte[] receiveBuffer = new byte[4];
 
             int retryCount = 5;
@@ -91,7 +90,7 @@ namespace Machine
                     System.Threading.Thread.Sleep(100);
                 }
             }
-            Console.WriteLine("GetCounterValue After");
+            
             Array.Reverse(receiveBuffer);
             return BitConverter.ToInt32(receiveBuffer, 0);
         }
