@@ -40,7 +40,7 @@ namespace Machine
             byte dataToSend = 0;
             if (motorOn) dataToSend |= 0x01; // Setze Bit 0 für command1
             if (motorPlus) dataToSend |= 0x02;
-            int retryCount = 5;
+            int retryCount = 25;
             int attempts = 0;
             bool success = false;
             while (attempts < retryCount && !success)
@@ -64,11 +64,10 @@ namespace Machine
         }
 
         public static int GetCounterValue(I2cDevice i2cDevice)
-        {           
-            
+        {
             byte[] receiveBuffer = new byte[4];
 
-            int retryCount = 5;
+            int retryCount = 25;
 
             int attempts = 0;
             bool success = false;
@@ -90,7 +89,7 @@ namespace Machine
                     System.Threading.Thread.Sleep(100);
                 }
             }
-            
+
             Array.Reverse(receiveBuffer);
             return BitConverter.ToInt32(receiveBuffer, 0);
         }
