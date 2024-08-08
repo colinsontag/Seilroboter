@@ -47,11 +47,16 @@ namespace Startup
             bool lenghtreached = false;
             while (cableLenghtToReach != 666)
             {
-                if (Console.ReadKey().Key == ConsoleKey.Enter)
+                if (Console.KeyAvailable)
                 {
-                    Console.WriteLine("Manual Exit");
-                    break;
+                    var key = Console.ReadKey(intercept: true);
+                    if (key.Key == ConsoleKey.Enter)
+                    {
+                        Console.WriteLine("Enter key pressed. Exiting loop.");
+                        break;
+                    }
                 }
+
                 foreach (Drive drive in drives)
                 {
                     if (Math.Abs(drive.UnrolledCableLength - cableLenghtToReach) >= angleDistance)
@@ -79,9 +84,6 @@ namespace Startup
             DriveInteraction.SendMotor(i2cDevice1, motorOn, motorPlus);
             DriveInteraction.SendMotor(i2cDevice2, motorOn, motorPlus);
             DriveInteraction.SendMotor(i2cDevice3, motorOn, motorPlus);
-
-            Console.WriteLine("Neue Laenge Eingeben");
-            cableLenghtToReach = Convert.ToDouble(Console.ReadLine());
         }
     }
 }
