@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Device.I2c;
+using System.Net.Sockets;
 
 namespace Machine
 {
     public static class DriveInteraction
     {
-        public static void ChangeDriveCabelLenght(Drive drive, double angleDistance, int I2CBusIdController, I2cDevice i2cDevice, double cableLenghtToReach)
+        public static void ChangeDriveCabelLenght(Drive drive, double angleDistance, string ipAddress, int port, double cableLenghtToReach)
         {
             bool motorOn = true;
             bool motorPlus = false;
@@ -21,21 +21,21 @@ namespace Machine
             {
                 motorPlus = false;
             }
-            SendMotor(i2cDevice, motorOn, motorPlus);
-            drive.UnrolledCableLength = RefreshDrive(i2cDevice, drive.I2CBusId, I2CBusIdController, angleDistance);
+            SendMotor(ipAddress, port, motorOn, motorPlus);
+            drive.UnrolledCableLength = RefreshDrive(ipAddress, port, angleDistance);
             Console.WriteLine(drive.UnrolledCableLength);
         }
 
-        public static double RefreshDrive(I2cDevice i2cDevice, int arduinoAddress, int I2CBusId, double angleDistance)
+        public static double RefreshDrive(string ipAddress, int port, double angleDistance)
         {
-            var counterValue = GetCounterValue(i2cDevice);
-            Console.WriteLine($"Daten von Arduino {arduinoAddress}: {counterValue}");
+            var counterValue = GetCounterValue(ipAddress, port);
+            Console.WriteLine($"Daten von Arduino {ipAddress}:{port}: {counterValue}");
 
             var cableLenght = counterValue * angleDistance;
             return cableLenght;
         }
 
-        public static void SendMotor(I2cDevice i2cDevice, bool motorOn, bool motorPlus)
+        public static void SendMotor(string ipAddress, int port, bool motorOn, bool motorPlus)
         {
             byte dataToSend = 0;
             if (motorOn) dataToSend |= 0x01; // Setze Bit 0 für command1
@@ -47,38 +47,44 @@ namespace Machine
             {
                 try
                 {
-                    i2cDevice.Write(new byte[] { dataToSend });
-                    success = true;
+                    using (TcpClient client = new TcpClient(ipAddress, port))
+                    {
+                        NetworkStream stream = client.GetStream();
+                        stream.Write(new byte[] { dataToSend }, 0, 1);
+                        success = true;
+                    }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Attempts: " + attempts);
-                    attempts++;
+                    attempts++; 
                     if (attempts >= retryCount)
                     {
-                        throw new Exception($"Failed to send I2C data after {retryCount} attempts.", ex);
+                        throw new Exception($"Failed to send data after {retryCount} attempts.", ex);
                     }
                     System.Threading.Thread.Sleep(100);
                 }
             }
         }
 
-        public static int GetCounterValue(I2cDevice i2cDevice)
+        public static int GetCounterValue(string ipAddress, int port)
         {
             Console.WriteLine("GetCounterValue Start");
-            Console.WriteLine(i2cDevice.ConnectionSettings.BusId + " - " + i2cDevice.ConnectionSettings.DeviceAddress);
             byte[] receiveBuffer = new byte[4];
 
             int retryCount = 5;
-
             int attempts = 0;
             bool success = false;
             while (attempts < retryCount && !success)
             {
                 try
                 {
-                    i2cDevice.Read(receiveBuffer);
-                    success = true;
+                    using (TcpClient client = new TcpClient(ipAddress, port))
+                    {
+                        NetworkStream stream = client.GetStream();
+                        stream.Read(receiveBuffer, 0, receiveBuffer.Length);
+                        success = true;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -86,7 +92,7 @@ namespace Machine
                     attempts++;
                     if (attempts >= retryCount)
                     {
-                        throw new Exception($"Failed to recive I2C data after {retryCount} attempts.", ex);
+                        throw new Exception($"Failed to receive data after {retryCount} attempts.", ex);
                     }
                     System.Threading.Thread.Sleep(100);
                 }
