@@ -1,8 +1,9 @@
-﻿using Startup;
-using System.Device.I2c;
-using System;
+﻿using System;
 using System.Diagnostics;
-using Machine;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Main
 {
@@ -15,7 +16,8 @@ namespace Main
             try
             {
                 stopwatch.Start();
-                StartupWorkflow.Start();
+                // Server starten
+                StartServer();
             }
             catch (Exception ex)
             {
@@ -24,32 +26,71 @@ namespace Main
             finally
             {
                 stopwatch.Stop();
-                const int busId = 1;
-                Console.WriteLine("motor stop routine");
-                // I2C-Adressen der Arduinos
-                const int arduinoAddress1 = 0x08;
-                const int arduinoAddress2 = 0x09;
-                const int arduinoAddress3 = 0x0A;
-                // Initialisiere I2C-Verbindung zu jedem Arduino
-                var i2cSettings1 = new I2cConnectionSettings(busId, arduinoAddress1);
-                var i2cDevice1 = I2cDevice.Create(i2cSettings1);
-
-                var i2cSettings2 = new I2cConnectionSettings(busId, arduinoAddress2);
-                var i2cDevice2 = I2cDevice.Create(i2cSettings2);
-
-                var i2cSettings3 = new I2cConnectionSettings(busId, arduinoAddress3);
-                var i2cDevice3 = I2cDevice.Create(i2cSettings3);
-                var motorOn = false;
-                var motorPlus = false;
-                Console.WriteLine("Start Disabling Motors");
-                DriveInteraction.SendMotor(i2cDevice1, motorOn, motorPlus);
-                DriveInteraction.SendMotor(i2cDevice2, motorOn, motorPlus);
-                DriveInteraction.SendMotor(i2cDevice3, motorOn, motorPlus);
-
                 Console.WriteLine("Seilroboter Anwendung Beendet");
                 Console.WriteLine("Ausgeführte Zeit: " + stopwatch.Elapsed);
                 Console.WriteLine("Drücken Sie eine Taste zum Beenden...");
                 Console.ReadKey();
+            }
+        }
+
+        private static void StartServer()
+        {
+            TcpListener server = null;
+            try
+            {
+                // Server auf Port 5000 starten
+                Int32 port = 5000;
+                IPAddress localAddr = IPAddress.Parse("192.168.1.1"); // Raspberry Pi IP
+                //IPAddress localAddr = IPAddress.Any; // Raspberry Pi IP
+                server = new TcpListener(localAddr, port);
+
+                server.Start();
+                Console.WriteLine("Server gestartet. Warte auf Verbindungen...");
+
+                // Endlosschleife für den Serverbetrieb
+                while (true)
+                {
+                    TcpClient client = server.AcceptTcpClient();
+                    Console.WriteLine("Client verbunden!");
+
+                    Task.Run(() => HandleClient(client));
+                }
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("SocketException: {0}", e);
+            }
+            finally
+            {
+                server?.Stop();
+            }
+        }
+
+        private static void HandleClient(TcpClient client)
+        {
+            NetworkStream stream = client.GetStream();
+            byte[] buffer = new byte[256];
+            int bytesRead;
+
+            try
+            {
+                while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
+                {
+                    string data = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    Console.WriteLine($"Empfangen: {data}");
+                    
+                    string response = "Befehl empfangen";
+                    byte[] msg = Encoding.ASCII.GetBytes(response);
+                    stream.Write(msg, 0, msg.Length);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: {0}", e.Message);
+            }
+            finally
+            {
+                client.Close();
             }
         }
     }
