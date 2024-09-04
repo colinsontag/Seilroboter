@@ -38,16 +38,13 @@ namespace Main
             TcpListener server = null;
             try
             {
-                // Server auf Port 5000 starten
                 Int32 port = 5000;
-                IPAddress localAddr = IPAddress.Parse("192.168.1.1"); // Raspberry Pi IP
-                //IPAddress localAddr = IPAddress.Any; // Raspberry Pi IP
+                IPAddress localAddr = IPAddress.Any;  // Accept connections from any IP address
                 server = new TcpListener(localAddr, port);
 
                 server.Start();
                 Console.WriteLine("Server gestartet. Warte auf Verbindungen...");
 
-                // Endlosschleife für den Serverbetrieb
                 while (true)
                 {
                     TcpClient client = server.AcceptTcpClient();
@@ -69,19 +66,31 @@ namespace Main
         private static void HandleClient(TcpClient client)
         {
             NetworkStream stream = client.GetStream();
-            byte[] buffer = new byte[256];
-            int bytesRead;
+            StreamReader reader = new StreamReader(stream);
+            StreamWriter writer = new StreamWriter(stream) { AutoFlush = true };
 
             try
             {
-                while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
+                while (true)
                 {
-                    string data = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine($"Empfangen: {data}");
-                    
-                    string response = "Befehl empfangen";
-                    byte[] msg = Encoding.ASCII.GetBytes(response);
-                    stream.Write(msg, 0, msg.Length);
+                    string data = reader.ReadLine();  // Read the incoming data as a string
+                    if (data == null) break;  // Exit the loop if client disconnects
+
+                    Console.WriteLine($"Empfangen: {data}");  // Print the received data
+
+                    int counter;
+                    if (int.TryParse(data, out counter))  // Try to parse the data to an integer
+                    {
+                        Console.WriteLine($"Empfangener Zählerwert: {counter}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Ungültige Daten empfangen.");
+                    }
+
+                    // Send a response back to the client (Arduino)
+                    string response = "Befehl empfangen\n";
+                    writer.WriteLine(response);
                 }
             }
             catch (Exception e)
@@ -91,6 +100,7 @@ namespace Main
             finally
             {
                 client.Close();
+                Console.WriteLine("Client getrennt.");
             }
         }
     }
