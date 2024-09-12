@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Machine;
+using System;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
@@ -41,16 +42,17 @@ namespace Main
                 Int32 port = 5000;
                 IPAddress localAddr = IPAddress.Any;  // Accept connections from any IP address
                 server = new TcpListener(localAddr, port);
-
+                int lenghtToReach = 0;
+                Console.WriteLine("Eingabe der zu erreichenden länge");
+                lenghtToReach = Convert.ToInt32(Console.ReadLine());
                 server.Start();
                 Console.WriteLine("Server gestartet. Warte auf Verbindungen...");
 
                 while (true)
                 {
                     TcpClient client = server.AcceptTcpClient();
-                    Console.WriteLine("Client verbunden!");
 
-                    Task.Run(() => HandleClient(client));
+                    Task.Run(() => HandleClient(client, lenghtToReach));
                 }
             }
             catch (SocketException e)
@@ -63,7 +65,7 @@ namespace Main
             }
         }
 
-        private static void HandleClient(TcpClient client)
+        private static void HandleClient(TcpClient client, int lenghtToReach)
         {
             NetworkStream stream = client.GetStream();
             StreamReader reader = new StreamReader(stream);
@@ -75,12 +77,25 @@ namespace Main
                 {
                     string data = reader.ReadLine();  // Read the incoming data as a string
                     if (data == null) break;  // Exit the loop if client disconnects
+                    int response = 0;
 
                     Console.WriteLine($"Empfangen: {data}");  // Print the received data
 
                     int counter;
                     if (int.TryParse(data, out counter))  // Try to parse the data to an integer
                     {
+                        const double angleDistance = 3.2725;
+                        if (counter * angleDistance <= lenghtToReach)
+                        {
+                            Console.WriteLine("no break");  // Print the received data
+                            response = 1;
+                        }
+                        else
+                        {
+                            response = 0;
+                            Console.WriteLine("break");
+                            break;
+                        }
                         Console.WriteLine($"Empfangener Zählerwert: {counter}");
                     }
                     else
@@ -89,7 +104,7 @@ namespace Main
                     }
 
                     // Send a response back to the client (Arduino)
-                    string response = "Befehl empfangen\n";
+
                     writer.WriteLine(response);
                 }
             }
@@ -99,8 +114,8 @@ namespace Main
             }
             finally
             {
-                client.Close();
-                Console.WriteLine("Client getrennt.");
+                //client.Close();
+                //Console.WriteLine("Client getrennt.");
             }
         }
     }
