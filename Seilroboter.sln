@@ -41,6 +41,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Main", "Main\Main.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DEVProject", "DEVProject\DEVProject.csproj", "{2AB3271D-2274-4952-8A2A-0F0EC3FDB5E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ethernet", "Ethernet\Ethernet.csproj", "{4B6B0E47-B04F-4974-BFF3-4C2C4A65860D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{2AB3271D-2274-4952-8A2A-0F0EC3FDB5E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2AB3271D-2274-4952-8A2A-0F0EC3FDB5E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2AB3271D-2274-4952-8A2A-0F0EC3FDB5E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B6B0E47-B04F-4974-BFF3-4C2C4A65860D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B6B0E47-B04F-4974-BFF3-4C2C4A65860D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B6B0E47-B04F-4974-BFF3-4C2C4A65860D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B6B0E47-B04F-4974-BFF3-4C2C4A65860D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -106,6 +112,7 @@ Global
 		{96B691A3-B7F5-489F-9835-378E8732E038} = {7D9879EB-DB7C-429B-BC56-17A9DED18C54}
 		{8FE7C09A-FEC5-40F6-8344-AE73453993FA} = {57E16659-9B32-4CA7-9A04-B1EE029066AB}
 		{2AB3271D-2274-4952-8A2A-0F0EC3FDB5E7} = {C41FDAC8-6103-4D86-8D37-33B67A8C78B6}
+		{4B6B0E47-B04F-4974-BFF3-4C2C4A65860D} = {87C0D0B5-4D64-41B0-995A-B39B4C430505}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {78365FE0-0584-4640-AACA-24E35DBC161A}

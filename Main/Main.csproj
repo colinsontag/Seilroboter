@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ethernet\Ethernet.csproj" />
     <ProjectReference Include="..\Startup\Startup.csproj" />
   </ItemGroup>
 
