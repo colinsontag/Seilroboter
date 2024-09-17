@@ -11,6 +11,9 @@ namespace Ethernet
 {
     public class ServerUtilities
     {
+        private static bool reached = false;
+        private static int lenghtToReach = 0;
+
         public static void StartServer()
         {
             TcpListener server = null;
@@ -18,17 +21,30 @@ namespace Ethernet
             {
                 Int32 port = 5000;
                 IPAddress localAddr = IPAddress.Any;  // Accept connections from any IP address
-                server = new TcpListener(localAddr, port);
-                int lenghtToReach = 0;
+
                 Console.WriteLine("Eingabe der zu erreichenden länge");
                 lenghtToReach = Convert.ToInt32(Console.ReadLine());
-                server.Start();
+                server = new TcpListener(localAddr, port);
                 Console.WriteLine("Server gestartet. Warte auf Verbindungen...");
 
                 while (true)
                 {
-                    TcpClient client = server.AcceptTcpClient();
-                    Task.Run(() => HandleClient(client, lenghtToReach));
+                    server.Stop();
+
+                    server.Start();
+                    var test = new List<Task>();
+                    if (reached == false)
+                    {
+                        TcpClient client = server.AcceptTcpClient();
+                        Console.WriteLine(lenghtToReach);
+                        Task.Run(() => HandleClient(client, lenghtToReach));
+                    }
+                    if (reached == true)
+                    {
+                        Console.WriteLine("Eingabe der zu erreichenden länge");
+                        lenghtToReach = Convert.ToInt32(Console.ReadLine());
+                        reached = false;
+                    }
                 }
             }
             catch (SocketException e)
@@ -44,22 +60,24 @@ namespace Ethernet
         private static void HandleClient(TcpClient client, int lenghtToReach)
         {
             NetworkStream stream = client.GetStream();
+
             StreamReader reader = new StreamReader(stream);
             StreamWriter writer = new StreamWriter(stream) { AutoFlush = true };
 
             try
             {
-                while (true)
+                int response = 0;
+                while (reached == false)
                 {
                     string data = reader.ReadLine();  // Read the incoming data as a string
                     if (data == null) break;  // Exit the loop if client disconnects
-                    int response = 0;
 
                     Console.WriteLine($"Empfangen: {data}");  // Print the received data
 
                     int counter;
                     if (int.TryParse(data, out counter))  // Try to parse the data to an integer
                     {
+                        Console.WriteLine("lenghtto: " + lenghtToReach);
                         const double angleDistance = 5.1;
                         if (counter * angleDistance <= lenghtToReach - angleDistance)
                         {
@@ -73,6 +91,7 @@ namespace Ethernet
                         }
                         else
                         {
+                            reached = true;
                             response = 0;
                             Console.WriteLine("break");
                         }
@@ -82,10 +101,8 @@ namespace Ethernet
                     {
                         Console.WriteLine("Ungültige Daten empfangen.");
                     }
-
-                    // Send a response back to the client (Arduino)
-
                     writer.WriteLine(response);
+                    // Send a response back to the client (Arduino)
                 }
             }
             catch (Exception e)
