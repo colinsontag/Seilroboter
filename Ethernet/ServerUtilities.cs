@@ -81,7 +81,7 @@ namespace Ethernet
                         const double angleDistance = 5.1;
                         if (counter * angleDistance <= lenghtToReach - angleDistance)
                         {
-                            Console.WriteLine("no breakl");  // Print the received data
+                            Console.WriteLine("no break");  // Print the received data
                             response = 1;
                         }
                         else if (counter * angleDistance >= lenghtToReach + angleDistance)
