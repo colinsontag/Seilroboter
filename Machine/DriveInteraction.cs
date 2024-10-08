@@ -57,7 +57,7 @@ namespace Machine
                 catch (Exception ex)
                 {
                     Console.WriteLine("Attempts: " + attempts);
-                    attempts++; 
+                    attempts++;
                     if (attempts >= retryCount)
                     {
                         throw new Exception($"Failed to send data after {retryCount} attempts.", ex);
