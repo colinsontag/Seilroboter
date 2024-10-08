@@ -6,15 +6,15 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Ethernet
 {
     public class ServerUtilities
     {
-        private static bool reached = false;
         private static int lenghtToReach = 0;
 
-        public static void StartServer()
+        public static async void StartServer()
         {
             TcpListener server = null;
             try
@@ -25,25 +25,33 @@ namespace Ethernet
                 Console.WriteLine("Eingabe der zu erreichenden länge");
                 lenghtToReach = Convert.ToInt32(Console.ReadLine());
                 server = new TcpListener(localAddr, port);
+                server.Start();
                 Console.WriteLine("Server gestartet. Warte auf Verbindungen...");
+                var tasksDic = new Dictionary<string, Task>();
 
                 while (true)
                 {
-                    server.Stop();
-
-                    server.Start();
-                    var test = new List<Task>();
-                    if (reached == false)
+                    TcpClient client = server.AcceptTcpClient();
+                    Console.WriteLine(lenghtToReach);
+                    foreach (var task in tasksDic)
                     {
-                        TcpClient client = server.AcceptTcpClient();
-                        Console.WriteLine(lenghtToReach);
-                        Task.Run(() => HandleClient(client, lenghtToReach));
+                        if (task.Value.Status == TaskStatus.Running)
+                        {
+                            Console.WriteLine($"running device ip: {task.Key}");
+                        }
                     }
-                    if (reached == true)
+                    string clientIp = ((System.Net.IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
+
+                    if (!tasksDic.ContainsKey(clientIp))
+                    {
+                        var task = Task.Run(() => HandleClient(client, lenghtToReach));
+                        tasksDic.Add(clientIp, task);
+                    }
+                    if (tasksDic.Values.All(t => t.Status == TaskStatus.RanToCompletion))
                     {
                         Console.WriteLine("Eingabe der zu erreichenden länge");
                         lenghtToReach = Convert.ToInt32(Console.ReadLine());
-                        reached = false;
+                        tasksDic.Clear();
                     }
                 }
             }
@@ -51,16 +59,12 @@ namespace Ethernet
             {
                 Console.WriteLine("SocketException: {0}", e);
             }
-            finally
-            {
-                server?.Stop();
-            }
         }
 
-        private static void HandleClient(TcpClient client, int lenghtToReach)
+        private static bool HandleClient(TcpClient client, int lenghtToReach)
         {
             NetworkStream stream = client.GetStream();
-
+            var reached = false;
             StreamReader reader = new StreamReader(stream);
             StreamWriter writer = new StreamWriter(stream) { AutoFlush = true };
 
@@ -104,16 +108,14 @@ namespace Ethernet
                     writer.WriteLine(response);
                     // Send a response back to the client (Arduino)
                 }
+                return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine("Exception: {0}", e.Message);
+                return false;
             }
-            finally
-            {
-                client.Close();
-                //Console.WriteLine("Client getrennt.");
-            }
+            finally { client.Close(); }
         }
     }
 }
