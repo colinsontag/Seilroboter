@@ -14,7 +14,7 @@ namespace Ethernet
     {
         private static int lenghtToReach = 0;
 
-        public static async void StartServer()
+        public static void StartServer()
         {
             TcpListener server = null;
             try
