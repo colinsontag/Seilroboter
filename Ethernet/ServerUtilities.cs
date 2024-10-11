@@ -20,7 +20,7 @@ namespace Ethernet
             try
             {
                 Int32 port = 5000;
-                IPAddress localAddr = IPAddress.Any;  // Accept connections from any IP address
+                var localAddr = IPAddress.Any;  // Accept connections from any IP address
 
                 Console.WriteLine("Eingabe der zu erreichenden länge");
                 lenghtToReach = Convert.ToInt32(Console.ReadLine());
@@ -33,6 +33,7 @@ namespace Ethernet
                 {
                     TcpClient client = server.AcceptTcpClient();
                     Console.WriteLine(lenghtToReach);
+
                     foreach (var task in tasksDic)
                     {
                         if (task.Value.Status == TaskStatus.Running)
