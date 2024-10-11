@@ -116,7 +116,6 @@ namespace Ethernet
                 Console.WriteLine("Exception: {0}", e.Message);
                 return false;
             }
-            finally { client.Close(); }
         }
     }
 }
