@@ -56,9 +56,9 @@ namespace Ethernet
                     }
                 }
             }
-            catch (SocketException e)
+            catch (Exception e)
             {
-                Console.WriteLine("SocketException: {0}", e);
+                Console.WriteLine("Exception: {0}", e);
             }
         }
 
@@ -74,24 +74,24 @@ namespace Ethernet
                 int response = 0;
                 while (reached == false)
                 {
-                    string data = reader.ReadLine();  // Read the incoming data as a string
-                    if (data == null) break;  // Exit the loop if client disconnects
+                    string data = reader.ReadLine();
+                    if (data == null) break;
 
-                    Console.WriteLine($"Empfangen: {data}");  // Print the received data
+                    Console.WriteLine($"Empfangen: {data}");
 
                     int counter;
-                    if (int.TryParse(data, out counter))  // Try to parse the data to an integer
+                    if (int.TryParse(data, out counter))
                     {
                         Console.WriteLine("lenghtto: " + lenghtToReach);
                         const double angleDistance = 5.1;
                         if (counter * angleDistance <= lenghtToReach - angleDistance)
                         {
-                            Console.WriteLine("no break");  // Print the received data
+                            Console.WriteLine("no break");
                             response = 1;
                         }
                         else if (counter * angleDistance >= lenghtToReach + angleDistance)
                         {
-                            Console.WriteLine("no break");  // Print the received data
+                            Console.WriteLine("no break");
                             response = 2;
                         }
                         else
