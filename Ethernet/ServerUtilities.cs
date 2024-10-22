@@ -26,6 +26,9 @@ namespace Ethernet
                 lenghtToReach = Convert.ToInt32(Console.ReadLine());
                 server = new TcpListener(localAddr, port);
                 server.Start();
+                string localIP = GetLocalIPAddress();
+                Console.WriteLine($"The server IP address is: {localIP} and port is {port}");
+
                 Console.WriteLine("Server gestartet. Warte auf Verbindungen...");
                 var tasksDic = new Dictionary<string, Task>();
 
@@ -60,6 +63,20 @@ namespace Ethernet
             {
                 Console.WriteLine("Exception: {0}", e);
             }
+        }
+
+        private static string GetLocalIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                // Return the first IPv4 address that is not a loopback address
+                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    return ip.ToString();
+                }
+            }
+            throw new Exception("No network adapters with an IPv4 address in the system!");
         }
 
         private static bool HandleClient(TcpClient client, int lenghtToReach)
