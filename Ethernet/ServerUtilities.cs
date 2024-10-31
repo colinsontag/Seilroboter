@@ -86,37 +86,39 @@ namespace Ethernet
 
             try
             {
-                Console.WriteLine($"Start der Kommunikation mit {clientIp}");
+                Console.WriteLine($"\nVerbindung gestartet mit: {clientIp}");
 
                 while (!reached)
                 {
                     string data = reader.ReadLine();
                     if (data == null) break;
 
-                    Console.WriteLine($"Empfangen von {clientIp}: {data}");
-
-                    if (int.TryParse(data, out int counter))
+                    int counter;
+                    if (int.TryParse(data, out counter))
                     {
-                        Console.WriteLine($"[{clientIp}] Empfangener Zählerwert: {counter}");
-
                         const double angleDistance = 5.1;
                         double calculatedDistance = counter * angleDistance;
+
+                        // Strukturierte Ausgabe mit eingerückten Zeilen
+                        Console.WriteLine($"{clientIp}");
+                        Console.WriteLine($"  Empfangener Zählerwert: {counter}");
+                        Console.WriteLine($"  Berechnete Distanz: {calculatedDistance}");
 
                         int response;
                         if (calculatedDistance <= lengthToReach - angleDistance)
                         {
-                            Console.WriteLine($"[{clientIp}] Noch nicht erreicht");
+                            Console.WriteLine("  Status: Noch nicht erreicht");
                             response = 1;
                         }
                         else if (calculatedDistance >= lengthToReach + angleDistance)
                         {
-                            Console.WriteLine($"[{clientIp}] Über das Ziel hinaus");
+                            Console.WriteLine("  Status: Über das Ziel hinaus");
                             response = 2;
                         }
                         else
                         {
                             reached = true;
-                            Console.WriteLine($"[{clientIp}] Ziel erreicht. Motor aus.");
+                            Console.WriteLine("  Status: Ziel erreicht. Motor aus.");
                             response = 0;
                         }
 
@@ -124,10 +126,10 @@ namespace Ethernet
                     }
                     else
                     {
-                        Console.WriteLine($"[{clientIp}] Ungültige Daten empfangen.");
+                        Console.WriteLine($"{clientIp}\n  Status: Ungültige Daten empfangen.");
                     }
                 }
-                Console.WriteLine($"Beende Verbindung zu {clientIp}");
+                Console.WriteLine($"Verbindung beendet mit: {clientIp}\n");
                 return true;
             }
             catch (Exception e)
