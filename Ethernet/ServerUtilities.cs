@@ -6,116 +6,118 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace Ethernet
 {
     public class ServerUtilities
     {
-        private static int lenghtToReach = 0;
+        private static int lengthToReach = 0;
 
         public static void StartServer()
         {
             TcpListener server = null;
             try
             {
-                Int32 port = 5000;
-                IPAddress localAddr = IPAddress.Any;  // Accept connections from any IP address
+                int port = 5000;
+                IPAddress localAddr = IPAddress.Any; // Accept connections from any IP address
 
-                Console.WriteLine("Eingabe der zu erreichenden länge");
-                lenghtToReach = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine("Bitte geben Sie die zu erreichende Länge ein:");
+                lengthToReach = Convert.ToInt32(Console.ReadLine());
                 server = new TcpListener(localAddr, port);
                 server.Start();
                 Console.WriteLine("Server gestartet. Warte auf Verbindungen...");
+
                 var tasksDic = new Dictionary<string, Task>();
 
                 while (true)
                 {
                     TcpClient client = server.AcceptTcpClient();
-                    Console.WriteLine(lenghtToReach);
-                    foreach (var task in tasksDic)
-                    {
-                        if (task.Value.Status == TaskStatus.Running)
-                        {
-                            Console.WriteLine($"running device ip: {task.Key}");
-                        }
-                    }
-                    string clientIp = ((System.Net.IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
+                    string clientIp = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
+                    Console.WriteLine($"Verbindung von {clientIp}");
+
+                    // Alte abgeschlossene Tasks entfernen
+                    tasksDic = tasksDic.Where(t => t.Value.Status == TaskStatus.Running)
+                                       .ToDictionary(t => t.Key, t => t.Value);
 
                     if (!tasksDic.ContainsKey(clientIp))
                     {
-                        var task = Task.Run(() => HandleClient(client, lenghtToReach));
-                        tasksDic.Add(clientIp, task);
+                        var task = Task.Run(() => HandleClient(client, lengthToReach));
+                        tasksDic[clientIp] = task;
                     }
-                    if (tasksDic.Values.All(t => t.Status == TaskStatus.RanToCompletion))
+
+                    if (tasksDic.Values.All(t => t.IsCompleted))
                     {
-                        Console.WriteLine("Eingabe der zu erreichenden länge");
-                        lenghtToReach = Convert.ToInt32(Console.ReadLine());
+                        Console.WriteLine("Bitte geben Sie die zu erreichende Länge ein:");
+                        lengthToReach = Convert.ToInt32(Console.ReadLine());
                         tasksDic.Clear();
                     }
                 }
             }
             catch (SocketException e)
             {
-                Console.WriteLine("SocketException: {0}", e);
+                Console.WriteLine("SocketException: {0}", e.Message);
+            }
+            finally
+            {
+                server?.Stop();
             }
         }
 
-        private static bool HandleClient(TcpClient client, int lenghtToReach)
+        private static bool HandleClient(TcpClient client, int lengthToReach)
         {
             NetworkStream stream = client.GetStream();
-            var reached = false;
             StreamReader reader = new StreamReader(stream);
             StreamWriter writer = new StreamWriter(stream) { AutoFlush = true };
 
+            bool reached = false;
+
             try
             {
-                int response = 0;
-                while (reached == false)
+                while (!reached)
                 {
                     string data = reader.ReadLine();  // Read the incoming data as a string
-                    if (data == null) break;  // Exit the loop if client disconnects
+                    if (data == null) break;          // Exit the loop if client disconnects
 
-                    Console.WriteLine($"Empfangen: {data}");  // Print the received data
-
-                    int counter;
-                    if (int.TryParse(data, out counter))  // Try to parse the data to an integer
+                    if (int.TryParse(data, out int counter))  // Parse the counter data
                     {
-                        Console.WriteLine("lenghtto: " + lenghtToReach);
+                        Console.WriteLine($"Empfangener Zählerwert: {counter}");
+
                         const double angleDistance = 5.1;
-                        if (counter * angleDistance <= lenghtToReach - angleDistance)
+                        double calculatedDistance = counter * angleDistance;
+
+                        if (calculatedDistance <= lengthToReach - angleDistance)
                         {
-                            Console.WriteLine("no break");  // Print the received data
-                            response = 1;
+                            Console.WriteLine("Motor On Up");
+                            writer.WriteLine(1); // Signal to move motor up
                         }
-                        else if (counter * angleDistance >= lenghtToReach + angleDistance)
+                        else if (calculatedDistance >= lengthToReach + angleDistance)
                         {
-                            Console.WriteLine("no break");  // Print the received data
-                            response = 2;
+                            Console.WriteLine("Motor On Down");
+                            writer.WriteLine(2); // Signal to move motor down
                         }
                         else
                         {
                             reached = true;
-                            response = 0;
-                            Console.WriteLine("break");
+                            Console.WriteLine("Ziel erreicht. Motor aus.");
+                            writer.WriteLine(0); // Signal to stop motor
                         }
-                        Console.WriteLine($"Empfangener Zählerwert: {counter * angleDistance}");
                     }
                     else
                     {
                         Console.WriteLine("Ungültige Daten empfangen.");
                     }
-                    writer.WriteLine(response);
-                    // Send a response back to the client (Arduino)
                 }
                 return true;
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception: {0}", e.Message);
+                Console.WriteLine("Fehler: {0}", e.Message);
                 return false;
             }
-            finally { client.Close(); }
+            finally
+            {
+                client.Close();
+            }
         }
     }
 }
