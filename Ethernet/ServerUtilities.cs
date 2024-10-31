@@ -25,6 +25,7 @@ namespace Ethernet
                 lengthToReach = Convert.ToInt32(Console.ReadLine());
                 server = new TcpListener(localAddr, port);
                 server.Start();
+
                 string localIP = GetLocalIPAddress();
                 Console.WriteLine($"The server IP address is: {localIP} and port is {port}");
 
@@ -35,23 +36,16 @@ namespace Ethernet
                 while (true)
                 {
                     TcpClient client = server.AcceptTcpClient();
-                    Console.WriteLine(lengthToReach);
-
-                    foreach (var task in tasksDic)
-                    {
-                        if (task.Value.Status == TaskStatus.Running)
-                        {
-                            Console.WriteLine($"running device IP: {task.Key}");
-                        }
-                    }
                     string clientIp = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
+                    Console.WriteLine($"Neue Verbindung von: {clientIp}");
 
+                    // Alte abgeschlossene Tasks entfernen
                     tasksDic = tasksDic.Where(t => t.Value.Status == TaskStatus.Running)
                                        .ToDictionary(t => t.Key, t => t.Value);
 
                     if (!tasksDic.ContainsKey(clientIp))
                     {
-                        var task = Task.Run(() => HandleClient(client, lengthToReach));
+                        var task = Task.Run(() => HandleClient(client, lengthToReach, clientIp));
                         tasksDic[clientIp] = task;
                     }
 
@@ -65,11 +59,7 @@ namespace Ethernet
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception: {0}", e.Message);
-            }
-            finally
-            {
-                server?.Stop();
+                Console.WriteLine("Exception: {0}", e);
             }
         }
 
@@ -86,7 +76,7 @@ namespace Ethernet
             throw new Exception("No network adapters with an IPv4 address in the system!");
         }
 
-        private static bool HandleClient(TcpClient client, int lengthToReach)
+        private static bool HandleClient(TcpClient client, int lengthToReach, string clientIp)
         {
             NetworkStream stream = client.GetStream();
             StreamReader reader = new StreamReader(stream);
@@ -96,51 +86,53 @@ namespace Ethernet
 
             try
             {
+                Console.WriteLine($"Start der Kommunikation mit {clientIp}");
+
                 while (!reached)
                 {
                     string data = reader.ReadLine();
                     if (data == null) break;
 
-                    Console.WriteLine($"Empfangen: {data}");
+                    Console.WriteLine($"Empfangen von {clientIp}: {data}");
 
-                    int counter;
-                    if (int.TryParse(data, out counter))
+                    if (int.TryParse(data, out int counter))
                     {
-                        Console.WriteLine($"Empfangener Zählerwert: {counter}");
+                        Console.WriteLine($"[{clientIp}] Empfangener Zählerwert: {counter}");
 
                         const double angleDistance = 5.1;
                         double calculatedDistance = counter * angleDistance;
-                        int response;
 
+                        int response;
                         if (calculatedDistance <= lengthToReach - angleDistance)
                         {
-                            Console.WriteLine("Motor läuft hoch");
-                            response = 1; // Signal to move motor up
+                            Console.WriteLine($"[{clientIp}] Noch nicht erreicht");
+                            response = 1;
                         }
                         else if (calculatedDistance >= lengthToReach + angleDistance)
                         {
-                            Console.WriteLine("Motor läuft runter");
-                            response = 2; // Signal to move motor down
+                            Console.WriteLine($"[{clientIp}] Über das Ziel hinaus");
+                            response = 2;
                         }
                         else
                         {
                             reached = true;
-                            Console.WriteLine("Ziel erreicht. Motor aus.");
-                            response = 0; // Signal to stop motor
+                            Console.WriteLine($"[{clientIp}] Ziel erreicht. Motor aus.");
+                            response = 0;
                         }
 
-                        writer.WriteLine(response); // Send response to client
+                        writer.WriteLine(response); // Antwort an den Arduino senden
                     }
                     else
                     {
-                        Console.WriteLine("Ungültige Daten empfangen.");
+                        Console.WriteLine($"[{clientIp}] Ungültige Daten empfangen.");
                     }
                 }
+                Console.WriteLine($"Beende Verbindung zu {clientIp}");
                 return true;
             }
             catch (Exception e)
             {
-                Console.WriteLine("Fehler: {0}", e.Message);
+                Console.WriteLine($"Fehler bei {clientIp}: {e.Message}");
                 return false;
             }
             finally
