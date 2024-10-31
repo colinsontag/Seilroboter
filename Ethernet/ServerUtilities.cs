@@ -19,7 +19,7 @@ namespace Ethernet
             try
             {
                 int port = 5000;
-                IPAddress localAddr = IPAddress.Any; // Accept connections from any IP address
+                IPAddress localAddr = IPAddress.Any;
 
                 Console.WriteLine("Bitte geben Sie die zu erreichende Länge ein:");
                 lengthToReach = Convert.ToInt32(Console.ReadLine());
@@ -35,18 +35,17 @@ namespace Ethernet
                 while (true)
                 {
                     TcpClient client = server.AcceptTcpClient();
-                    Console.WriteLine(lenghtToReach);
+                    Console.WriteLine(lengthToReach);
 
                     foreach (var task in tasksDic)
                     {
                         if (task.Value.Status == TaskStatus.Running)
                         {
-                            Console.WriteLine($"running device ip: {task.Key}");
+                            Console.WriteLine($"running device IP: {task.Key}");
                         }
                     }
-                    string clientIp = ((System.Net.IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
+                    string clientIp = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
 
-                    // Alte abgeschlossene Tasks entfernen
                     tasksDic = tasksDic.Where(t => t.Value.Status == TaskStatus.Running)
                                        .ToDictionary(t => t.Key, t => t.Value);
 
@@ -66,7 +65,11 @@ namespace Ethernet
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception: {0}", e);
+                Console.WriteLine("Exception: {0}", e.Message);
+            }
+            finally
+            {
+                server?.Stop();
             }
         }
 
@@ -75,8 +78,7 @@ namespace Ethernet
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
             {
-                // Return the first IPv4 address that is not a loopback address
-                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
                 {
                     return ip.ToString();
                 }
@@ -108,23 +110,26 @@ namespace Ethernet
 
                         const double angleDistance = 5.1;
                         double calculatedDistance = counter * angleDistance;
+                        int response;
 
                         if (calculatedDistance <= lengthToReach - angleDistance)
                         {
-                            Console.WriteLine("no break");
-                            response = 1;
+                            Console.WriteLine("Motor läuft hoch");
+                            response = 1; // Signal to move motor up
                         }
                         else if (calculatedDistance >= lengthToReach + angleDistance)
                         {
-                            Console.WriteLine("no break");
-                            response = 2;
+                            Console.WriteLine("Motor läuft runter");
+                            response = 2; // Signal to move motor down
                         }
                         else
                         {
                             reached = true;
                             Console.WriteLine("Ziel erreicht. Motor aus.");
-                            writer.WriteLine(0); // Signal to stop motor
+                            response = 0; // Signal to stop motor
                         }
+
+                        writer.WriteLine(response); // Send response to client
                     }
                     else
                     {
@@ -137,6 +142,10 @@ namespace Ethernet
             {
                 Console.WriteLine("Fehler: {0}", e.Message);
                 return false;
+            }
+            finally
+            {
+                client.Close();
             }
         }
     }
