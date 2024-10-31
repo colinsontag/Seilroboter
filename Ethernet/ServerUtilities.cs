@@ -12,6 +12,7 @@ namespace Ethernet
     public class ServerUtilities
     {
         private static int lengthToReach = 0;
+        private static readonly Dictionary<string, bool> deviceStatus = new Dictionary<string, bool>(); // Status jedes Geräts
 
         public static void StartServer()
         {
@@ -49,11 +50,16 @@ namespace Ethernet
                         tasksDic[clientIp] = task;
                     }
 
+                    // Überprüfen, ob alle Geräte ihr Ziel erreicht haben
                     if (tasksDic.Values.All(t => t.IsCompleted))
                     {
-                        Console.WriteLine("Bitte geben Sie die zu erreichende Länge ein:");
-                        lengthToReach = Convert.ToInt32(Console.ReadLine());
-                        tasksDic.Clear();
+                        // Überprüfen, ob alle Geräte erfolgreich ihr Ziel erreicht haben
+                        if (deviceStatus.Values.All(status => status))
+                        {
+                            Console.WriteLine("Alle Geräte haben ihr Ziel erreicht. Bitte geben Sie die neue Länge ein:");
+                            lengthToReach = Convert.ToInt32(Console.ReadLine());
+                            deviceStatus.Clear(); // Status zurücksetzen für die neuen Berechnungen
+                        }
                     }
                 }
             }
@@ -109,17 +115,20 @@ namespace Ethernet
                         {
                             Console.WriteLine("  Status: Noch nicht erreicht");
                             response = 1;
+                            deviceStatus[clientIp] = false; // Gerät hat Ziel nicht erreicht
                         }
                         else if (calculatedDistance >= lengthToReach + angleDistance)
                         {
                             Console.WriteLine("  Status: Über das Ziel hinaus");
                             response = 2;
+                            deviceStatus[clientIp] = false; // Gerät hat Ziel nicht erreicht
                         }
                         else
                         {
                             reached = true;
                             Console.WriteLine("  Status: Ziel erreicht. Motor aus.");
                             response = 0;
+                            deviceStatus[clientIp] = true; // Gerät hat Ziel erreicht
                         }
 
                         writer.WriteLine(response); // Antwort an den Arduino senden
