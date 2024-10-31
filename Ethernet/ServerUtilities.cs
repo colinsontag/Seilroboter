@@ -25,6 +25,9 @@ namespace Ethernet
                 lengthToReach = Convert.ToInt32(Console.ReadLine());
                 server = new TcpListener(localAddr, port);
                 server.Start();
+                string localIP = GetLocalIPAddress();
+                Console.WriteLine($"The server IP address is: {localIP} and port is {port}");
+
                 Console.WriteLine("Server gestartet. Warte auf Verbindungen...");
 
                 var tasksDic = new Dictionary<string, Task>();
@@ -32,8 +35,16 @@ namespace Ethernet
                 while (true)
                 {
                     TcpClient client = server.AcceptTcpClient();
-                    string clientIp = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
-                    Console.WriteLine($"Verbindung von {clientIp}");
+                    Console.WriteLine(lenghtToReach);
+
+                    foreach (var task in tasksDic)
+                    {
+                        if (task.Value.Status == TaskStatus.Running)
+                        {
+                            Console.WriteLine($"running device ip: {task.Key}");
+                        }
+                    }
+                    string clientIp = ((System.Net.IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
 
                     // Alte abgeschlossene Tasks entfernen
                     tasksDic = tasksDic.Where(t => t.Value.Status == TaskStatus.Running)
@@ -53,14 +64,24 @@ namespace Ethernet
                     }
                 }
             }
-            catch (SocketException e)
+            catch (Exception e)
             {
-                Console.WriteLine("SocketException: {0}", e.Message);
+                Console.WriteLine("Exception: {0}", e);
             }
-            finally
+        }
+
+        private static string GetLocalIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
             {
-                server?.Stop();
+                // Return the first IPv4 address that is not a loopback address
+                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    return ip.ToString();
+                }
             }
+            throw new Exception("No network adapters with an IPv4 address in the system!");
         }
 
         private static bool HandleClient(TcpClient client, int lengthToReach)
@@ -75,10 +96,13 @@ namespace Ethernet
             {
                 while (!reached)
                 {
-                    string data = reader.ReadLine();  // Read the incoming data as a string
-                    if (data == null) break;          // Exit the loop if client disconnects
+                    string data = reader.ReadLine();
+                    if (data == null) break;
 
-                    if (int.TryParse(data, out int counter))  // Parse the counter data
+                    Console.WriteLine($"Empfangen: {data}");
+
+                    int counter;
+                    if (int.TryParse(data, out counter))
                     {
                         Console.WriteLine($"Empfangener Zählerwert: {counter}");
 
@@ -87,13 +111,13 @@ namespace Ethernet
 
                         if (calculatedDistance <= lengthToReach - angleDistance)
                         {
-                            Console.WriteLine("Motor On Up");
-                            writer.WriteLine(1); // Signal to move motor up
+                            Console.WriteLine("no break");
+                            response = 1;
                         }
                         else if (calculatedDistance >= lengthToReach + angleDistance)
                         {
-                            Console.WriteLine("Motor On Down");
-                            writer.WriteLine(2); // Signal to move motor down
+                            Console.WriteLine("no break");
+                            response = 2;
                         }
                         else
                         {
@@ -113,10 +137,6 @@ namespace Ethernet
             {
                 Console.WriteLine("Fehler: {0}", e.Message);
                 return false;
-            }
-            finally
-            {
-                client.Close();
             }
         }
     }
