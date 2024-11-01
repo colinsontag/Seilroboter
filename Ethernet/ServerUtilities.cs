@@ -87,7 +87,7 @@ namespace Ethernet
             {
                 Console.WriteLine($"\nVerbindung gestartet mit: {clientIp}");
 
-                while (true)
+                while (!reached)
                 {
                     string data = reader.ReadLine();
                     if (data == null) break; // Verbindung unterbrochen
@@ -131,7 +131,6 @@ namespace Ethernet
                         Console.WriteLine($"{clientIp}\n  Status: Ungültige Daten empfangen.");
                     }
                 }
-                Console.WriteLine($"Verbindung beendet mit: {clientIp}\n");
             }
             catch (Exception e)
             {
@@ -139,8 +138,6 @@ namespace Ethernet
             }
             finally
             {
-                client.Close();
-                clients.Remove(clientIp); // Client aus der Liste entfernen
             }
         }
     }
