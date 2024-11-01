@@ -13,6 +13,7 @@ namespace Ethernet
     {
         private static int lengthToReach = 0;
         private static readonly Dictionary<string, bool> deviceStatus = new Dictionary<string, bool>(); // Status jedes Geräts
+        private static readonly Dictionary<string, TcpClient> clients = new Dictionary<string, TcpClient>(); // Alle verbundenen Clients
 
         public static void StartServer()
         {
@@ -32,34 +33,26 @@ namespace Ethernet
 
                 Console.WriteLine("Server gestartet. Warte auf Verbindungen...");
 
-                var tasksDic = new Dictionary<string, Task>();
-
                 while (true)
                 {
                     TcpClient client = server.AcceptTcpClient();
                     string clientIp = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
                     Console.WriteLine($"Neue Verbindung von: {clientIp}");
 
-                    // Alte abgeschlossene Tasks entfernen
-                    tasksDic = tasksDic.Where(t => t.Value.Status == TaskStatus.Running)
-                                       .ToDictionary(t => t.Key, t => t.Value);
-
-                    if (!tasksDic.ContainsKey(clientIp))
+                    // Prüfen, ob der Client schon verbunden ist
+                    if (!clients.ContainsKey(clientIp))
                     {
-                        var task = Task.Run(() => HandleClient(client, lengthToReach, clientIp));
-                        tasksDic[clientIp] = task;
+                        clients[clientIp] = client; // Speichern des Clients
+                        deviceStatus[clientIp] = false; // Anfangsstatus: Ziel nicht erreicht
+                        Task.Run(() => HandleClient(client, lengthToReach, clientIp));
                     }
 
                     // Überprüfen, ob alle Geräte ihr Ziel erreicht haben
-                    if (tasksDic.Values.All(t => t.IsCompleted))
+                    if (deviceStatus.Values.All(status => status))
                     {
-                        // Überprüfen, ob alle Geräte erfolgreich ihr Ziel erreicht haben
-                        if (deviceStatus.Values.All(status => status))
-                        {
-                            Console.WriteLine("Alle Geräte haben ihr Ziel erreicht. Bitte geben Sie die neue Länge ein:");
-                            lengthToReach = Convert.ToInt32(Console.ReadLine());
-                            deviceStatus.Clear(); // Status zurücksetzen für die neuen Berechnungen
-                        }
+                        Console.WriteLine("Alle Geräte haben ihr Ziel erreicht. Bitte geben Sie die neue Länge ein:");
+                        lengthToReach = Convert.ToInt32(Console.ReadLine());
+                        deviceStatus.Keys.ToList().ForEach(key => deviceStatus[key] = false); // Status zurücksetzen
                     }
                 }
             }
@@ -82,7 +75,7 @@ namespace Ethernet
             throw new Exception("No network adapters with an IPv4 address in the system!");
         }
 
-        private static bool HandleClient(TcpClient client, int lengthToReach, string clientIp)
+        private static void HandleClient(TcpClient client, int lengthToReach, string clientIp)
         {
             NetworkStream stream = client.GetStream();
             StreamReader reader = new StreamReader(stream);
@@ -94,10 +87,10 @@ namespace Ethernet
             {
                 Console.WriteLine($"\nVerbindung gestartet mit: {clientIp}");
 
-                while (!reached)
+                while (true)
                 {
                     string data = reader.ReadLine();
-                    if (data == null) break;
+                    if (data == null) break; // Verbindung unterbrochen
 
                     int counter;
                     if (int.TryParse(data, out counter))
@@ -139,16 +132,15 @@ namespace Ethernet
                     }
                 }
                 Console.WriteLine($"Verbindung beendet mit: {clientIp}\n");
-                return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Fehler bei {clientIp}: {e.Message}");
-                return false;
             }
             finally
             {
                 client.Close();
+                clients.Remove(clientIp); // Client aus der Liste entfernen
             }
         }
     }
