@@ -27,7 +27,7 @@ namespace Startup
 
             foreach (Drive drive in drives)
             {
-                Console.WriteLine($"Drive IP:{drive.I2CBusId}:" + drive.UnrolledCableLength.ToString());
+                Console.WriteLine($"Drive IP:{drive.EthernetIP}:" + drive.UnrolledCableLength.ToString());
             }
 
             double cableLenghtToReach = 150;
@@ -48,16 +48,20 @@ namespace Startup
                 {
                     if (Math.Abs(drive.UnrolledCableLength - cableLenghtToReach) >= angleDistance)
                     {
+<<<<<<< HEAD
+                        if (drive.EthernetIP == i2cDevice1.ConnectionSettings.DeviceAddress)
+=======
                         Console.WriteLine(drive.I2CBusId + ":" + Math.Abs(drive.UnrolledCableLength - cableLenghtToReach));
                         if (drive.I2CBusId == 1) // drive.I2CBusId entspricht i2cDevice1
+>>>>>>> Ethernet_Testing
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, ipAddress1, port1, cableLenghtToReach);
                         }
-                        else if (drive.I2CBusId == 2) // drive.I2CBusId entspricht i2cDevice2
+                        else if (drive.EthernetIP == 2) // drive.I2CBusId entspricht i2cDevice2
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, ipAddress2, port2, cableLenghtToReach);
                         }
-                        else if (drive.I2CBusId == 3) // drive.I2CBusId entspricht i2cDevice3
+                        else if (drive.EthernetIP == 3) // drive.I2CBusId entspricht i2cDevice3
                         {
                             DriveInteraction.ChangeDriveCabelLenght(drive, angleDistance, ipAddress3, port3, cableLenghtToReach);
                         }
@@ -71,12 +75,18 @@ namespace Startup
             bool motorPlus = false;
             Console.WriteLine("Start Disabling Motors");
 
+<<<<<<< HEAD
+            DriveInteraction.SendMotor(i2cDevice1, motorOn, motorPlus);
+            DriveInteraction.SendMotor(i2cDevice2, motorOn, motorPlus);
+            DriveInteraction.SendMotor(i2cDevice3, motorOn, motorPlus);
+=======
             DriveInteraction.SendMotor(ipAddress1, port1, motorOn, motorPlus);
             DriveInteraction.SendMotor(ipAddress2, port2, motorOn, motorPlus);
             DriveInteraction.SendMotor(ipAddress3, port3, motorOn, motorPlus);
 
             Console.WriteLine("Neue Laenge Eingeben");
             cableLenghtToReach = Convert.ToDouble(Console.ReadLine());
+>>>>>>> Ethernet_Testing
         }
     }
 }

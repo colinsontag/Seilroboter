@@ -7,14 +7,14 @@ namespace Machine
         public string Name { get; set; }
         public Point3D MountPosition { get; set; }
         public double UnrolledCableLength { get; set; }
-        public int I2CBusId { get; set; }
+        public int EthernetIP { get; set; }
 
-        public Drive(string name, Point3D mountPosition, float unrolledCableLength, int busId)
+        public Drive(string name, Point3D mountPosition, float unrolledCableLength, int ethernetIP)
         {
             MountPosition = mountPosition;
             Name = name;
             UnrolledCableLength = unrolledCableLength;
-            I2CBusId = busId;
+            EthernetIP = ethernetIP;
         }
     }
 }

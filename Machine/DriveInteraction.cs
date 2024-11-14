@@ -21,9 +21,15 @@ namespace Machine
             {
                 motorPlus = false;
             }
+<<<<<<< HEAD
+            SendMotor(i2cDevice, motorOn, motorPlus);
+            drive.UnrolledCableLength = RefreshDrive(i2cDevice, drive.EthernetIP, I2CBusIdController, angleDistance);
+            Console.WriteLine($"Drive {drive.EthernetIP} CableLenght: " + drive.UnrolledCableLength);
+=======
             SendMotor(ipAddress, port, motorOn, motorPlus);
             drive.UnrolledCableLength = RefreshDrive(ipAddress, port, angleDistance);
             Console.WriteLine(drive.UnrolledCableLength);
+>>>>>>> Ethernet_Testing
         }
 
         public static double RefreshDrive(string ipAddress, int port, double angleDistance)
@@ -69,11 +75,17 @@ namespace Machine
 
         public static int GetCounterValue(string ipAddress, int port)
         {
-            Console.WriteLine("GetCounterValue Start");
-            Console.WriteLine(i2cDevice.ConnectionSettings.BusId + " - " + i2cDevice.ConnectionSettings.DeviceAddress);
+<<<<<<< HEAD
             byte[] receiveBuffer = new byte[4];
-            int retryCount = 5;
 
+            int retryCount = 25;
+
+=======
+            Console.WriteLine("GetCounterValue Start");
+            byte[] receiveBuffer = new byte[4];
+
+            int retryCount = 5;
+>>>>>>> Ethernet_Testing
             int attempts = 0;
             bool success = false;
             while (attempts < retryCount && !success)

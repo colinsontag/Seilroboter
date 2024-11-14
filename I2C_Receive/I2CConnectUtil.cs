@@ -12,7 +12,7 @@ namespace I2C_Receive
     {
         public static I2cDevice CreateI2CDevice(List<Drive> drives, int I2CBusIdController, int i)
         {
-            var connectionSettings = new I2cConnectionSettings(I2CBusIdController, drives[i].I2CBusId);
+            var connectionSettings = new I2cConnectionSettings(I2CBusIdController, drives[i].EthernetIP);
             Console.WriteLine("Before Create" + i);
             var device = I2cDevice.Create(connectionSettings);
             Console.WriteLine("After Create" + i);
