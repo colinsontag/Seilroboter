@@ -15,9 +15,6 @@ namespace Startup
             string pathToPointList = "";
 
             InitProcessWorkflow.Start(pathToConfig, pathToPointList, out drives, out pointList);
-            PointListProcess.Start(drives, pointList);
         }
-
-
     }
 }
