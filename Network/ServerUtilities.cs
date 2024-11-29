@@ -23,12 +23,12 @@ public class ServerUtilities
         TcpListener server = null;
         try
         {
-            currentPosition = new Point3D(2400, 2400, -1800);
+            currentPosition = new Point3D(2500, 1500, -1800);
             int port = 5000;
             IPAddress localAddr = IPAddress.Any;
 
             // Berechnung der initialen Kabellängen (relativ zur aktuellen Position)
-            CalculateLengths(-400, 0, 0);  // Beispiel: keine Veränderung der Ausgangsposition
+            CalculateLengths(0, 0, 200);  // Beispiel: keine Veränderung der Ausgangsposition
             Console.WriteLine($"Initial position (already reached): {currentPosition}");
 
             server = new TcpListener(localAddr, port);
@@ -51,7 +51,9 @@ public class ServerUtilities
                 {
                     clients[clientIp] = client; // Speichern des Clients
                     deviceStatus[clientIp] = false; // Anfangsstatus: Ziel nicht erreicht
-                    Task.Run(() => HandleClient(client, clientIp));
+                    var relevantDriveMac = getMacByIp(clientIp);
+                    var relevantDrive = drives.Where(d => d.EthernetIP == relevantDriveMac).First();
+                    Task.Run(() => HandleClient(client, clientIp, relevantDrive));
                 }
 
                 // Überprüfen, ob alle Geräte ihr Ziel erreicht haben
@@ -162,7 +164,7 @@ public class ServerUtilities
         throw new Exception("No network adapters with an IPv4 address in the system!");
     }
 
-    private static void HandleClient(TcpClient client, string clientIp)
+    private static void HandleClient(TcpClient client, string clientIp, Drive relevantDrive)
     {
         NetworkStream stream = client.GetStream();
         StreamReader reader = new StreamReader(stream);
