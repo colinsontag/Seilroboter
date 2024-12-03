@@ -10,9 +10,9 @@ public class ServerUtilities
 
     private static readonly List<Drive> drives = new List<Drive>
         {
-            new Drive("Drive1", new Point3D(0, 0, 0), 0, "DE-AD-BE-EF-FE-ED"),
-            new Drive("Drive2", new Point3D(0, 3000, 0), 0, "F4-12-FA-6E-CF-EC"),
-            new Drive("Drive3", new Point3D(4800, 1500, 0), 0, "F4-12-FA-6E-97-BC")
+            new Drive("Drive1", new Point3D(0, 0, 0), 0, "DE-AD-BE-EF-FE-ED",3.1),
+            new Drive("Drive2", new Point3D(0, 3000, 0), 0, "F4-12-FA-6E-CF-EC", 3.85),
+            new Drive("Drive3", new Point3D(4800, 1500, 0), 0, "F4-12-FA-6E-97-BC",3.85)
         };
 
     private static readonly Dictionary<string, bool> deviceStatus = new Dictionary<string, bool>(); // Status jedes Geräts
@@ -23,12 +23,12 @@ public class ServerUtilities
         TcpListener server = null;
         try
         {
-            currentPosition = new Point3D(2500, 1500, -1800);
+            currentPosition = new Point3D(2500, 1500, -1100);
             int port = 5000;
             IPAddress localAddr = IPAddress.Any;
 
             // Berechnung der initialen Kabellängen (relativ zur aktuellen Position)
-            CalculateLengths(0, 0, 200);  // Beispiel: keine Veränderung der Ausgangsposition
+            CalculateLengths(0, 0, 300);  // Beispiel: keine Veränderung der Ausgangsposition
             Console.WriteLine($"Initial position (already reached): {currentPosition}");
 
             server = new TcpListener(localAddr, port);
@@ -185,7 +185,7 @@ public class ServerUtilities
                 if (int.TryParse(data, out counter))
                 {
                     const double angleDistance = 5.1;
-                    double calculatedDistance = counter * angleDistance;
+                    double calculatedDistance = counter * relevantDrive.AngleDistance;
 
                     double lengthToReach = GetLengthToReachForClient(clientIp);
 
