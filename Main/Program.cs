@@ -1,5 +1,4 @@
 ﻿using Machine;
-using Ethernet;
 
 using System;
 using System.Diagnostics;

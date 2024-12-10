@@ -1,0 +1,10 @@
+﻿Build started at 11:13...
+NuGet package restore failed. Please see Error List window for detailed warnings and errors.
+1>------ Build started: Project: Network, Configuration: Debug Any CPU ------
+Error occurred while restoring NuGet packages: Project unavailable.
+1>Skipping analyzers to speed up the build. You can execute 'Build' or 'Rebuild' command to run analyzers.
+1>C:\Users\csontag\source\repos\colinsontag\Seilroboter\Network\ServerUtilities.cs(186,13,186,20): error CS0106: The modifier 'private' is not valid for this item
+1>C:\Users\csontag\source\repos\colinsontag\Seilroboter\Network\ServerUtilities.cs(200,6,200,6): error CS1513: } expected
+1>Done building project "Network.csproj" -- FAILED.
+========== Build: 0 succeeded, 1 failed, 4 up-to-date, 0 skipped ==========
+========== Build completed at 11:13 and took 01,046 seconds ==========

@@ -1,4 +1,5 @@
 ﻿using MathNet.Spatial.Euclidean;
+using System.Net;
 
 namespace Machine
 {
@@ -7,14 +8,16 @@ namespace Machine
         public string Name { get; set; }
         public Point3D MountPosition { get; set; }
         public double UnrolledCableLength { get; set; }
-        public int I2CBusId { get; set; }
+        public string EthernetIP { get; set; }
+        public double AngleDistance { get; set; }
 
-        public Drive(string name, Point3D mountPosition, float unrolledCableLength, int busId)
+        public Drive(string name, Point3D mountPosition, float unrolledCableLength, string ethernetIP, double angleDistance)
         {
             MountPosition = mountPosition;
             Name = name;
             UnrolledCableLength = unrolledCableLength;
-            I2CBusId = busId;
+            EthernetIP = ethernetIP;
+            AngleDistance = angleDistance;
         }
     }
 }

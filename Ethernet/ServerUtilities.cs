@@ -6,12 +6,20 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using MathNet.Spatial.Euclidean;
+using Machine;
 
 namespace Ethernet
 {
     public class ServerUtilities
     {
-        private static int lengthToReach = 0;
+        private static readonly List<Drive> drives = new List<Drive>
+        {
+            new  Drive("Drive1", new Point3D(0, 0, 0), 0, 1),
+            new Drive("Drive2", new Point3D(1, 0, 0), 0, 2),
+            new Drive("Drive3", new Point3D(0, 1, 0), 0, 3)
+        };
+
         private static readonly Dictionary<string, bool> deviceStatus = new Dictionary<string, bool>(); // Status jedes Geräts
         private static readonly Dictionary<string, TcpClient> clients = new Dictionary<string, TcpClient>(); // Alle verbundenen Clients
 
@@ -23,8 +31,14 @@ namespace Ethernet
                 int port = 5000;
                 IPAddress localAddr = IPAddress.Any;
 
-                Console.WriteLine("Bitte geben Sie die zu erreichende Länge ein:");
-                lengthToReach = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine("Bitte geben Sie die gewünschten X, Y und Z Koordinaten ein:");
+                double x = Convert.ToDouble(Console.ReadLine());
+                double y = Convert.ToDouble(Console.ReadLine());
+                double z = Convert.ToDouble(Console.ReadLine());
+
+                // Berechne die Längen für jede Seilwinde basierend auf den X, Y und Z Koordinaten
+                CalculateLengths(x, y, z);
+
                 server = new TcpListener(localAddr, port);
                 server.Start();
 
@@ -44,14 +58,20 @@ namespace Ethernet
                     {
                         clients[clientIp] = client; // Speichern des Clients
                         deviceStatus[clientIp] = false; // Anfangsstatus: Ziel nicht erreicht
-                        Task.Run(() => HandleClient(client, lengthToReach, clientIp));
+                        Task.Run(() => HandleClient(client, clientIp));
                     }
 
                     // Überprüfen, ob alle Geräte ihr Ziel erreicht haben
                     if (deviceStatus.Values.All(status => status))
                     {
-                        Console.WriteLine("Alle Geräte haben ihr Ziel erreicht. Bitte geben Sie die neue Länge ein:");
-                        lengthToReach = Convert.ToInt32(Console.ReadLine());
+                        Console.WriteLine("Alle Geräte haben ihr Ziel erreicht. Bitte geben Sie die neuen X, Y und Z Koordinaten ein:");
+                        x = Convert.ToDouble(Console.ReadLine());
+                        y = Convert.ToDouble(Console.ReadLine());
+                        z = Convert.ToDouble(Console.ReadLine());
+
+                        // Berechne die neuen Längen
+                        CalculateLengths(x, y, z);
+
                         deviceStatus.Keys.ToList().ForEach(key => deviceStatus[key] = false); // Status zurücksetzen
                     }
                 }
@@ -60,6 +80,22 @@ namespace Ethernet
             {
                 Console.WriteLine("Exception: {0}", e);
             }
+        }
+
+        private static void CalculateLengths(double x, double y, double z)
+        {
+            Point3D targetPosition = new Point3D(x, y, z);
+
+            foreach (var drive in drives)
+            {
+                drive.UnrolledCableLength = CalculateDistance(drive.MountPosition, targetPosition);
+            }
+        }
+
+        private static double CalculateDistance(Point3D motorPosition, Point3D targetPosition)
+        {
+            // Berechne die euklidische Distanz zwischen dem Motor und dem Zielpunkt
+            return motorPosition.DistanceTo(targetPosition);
         }
 
         private static string GetLocalIPAddress()
@@ -75,7 +111,7 @@ namespace Ethernet
             throw new Exception("No network adapters with an IPv4 address in the system!");
         }
 
-        private static void HandleClient(TcpClient client, int lengthToReach, string clientIp)
+        private static void HandleClient(TcpClient client, string clientIp)
         {
             NetworkStream stream = client.GetStream();
             StreamReader reader = new StreamReader(stream);
@@ -104,6 +140,8 @@ namespace Ethernet
                         Console.WriteLine($"  Berechnete Distanz: {calculatedDistance}");
 
                         int response;
+                        double lengthToReach = GetLengthToReachForClient(clientIp);
+
                         if (calculatedDistance <= lengthToReach - angleDistance)
                         {
                             Console.WriteLine("  Status: Noch nicht erreicht");
@@ -138,6 +176,20 @@ namespace Ethernet
             }
             finally
             {
+            }
+        }
+
+        private static double GetLengthToReachForClient(string clientIp)
+        {
+            // Finde den Drive, der zur gegebenen IP-Adresse passt
+            var drive = drives.FirstOrDefault(d => d.EthernetIP.ToString() == clientIp);
+            if (drive != null)
+            {
+                return drive.UnrolledCableLength;
+            }
+            else
+            {
+                throw new Exception($"Kein Drive mit der IP-Adresse {clientIp} gefunden.");
             }
         }
     }
