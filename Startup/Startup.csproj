@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ConfigManger\ConfigManger.csproj" />
-    <ProjectReference Include="..\I2C_Receive\I2C_Receive.csproj" />
     <ProjectReference Include="..\Machine\Machine.csproj" />
   </ItemGroup>
 
